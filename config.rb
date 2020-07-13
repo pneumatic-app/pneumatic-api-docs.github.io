@@ -39,6 +39,9 @@ end
 activate :relative_assets
 set :relative_links, true
 
+# Custom build path
+set :build_dir, 'docs'
+
 # Build Configuration
 configure :build do
   # We do want to hash woff and woff2 as there's a bug where woff2 will use
