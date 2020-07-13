@@ -1,80 +1,46 @@
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+Welcome to the Pneumatic API! You can use our API to access Pneumatic public API endpoints, which can get information on workflows and run processes.
 
-We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
-
-This example API documentation page was created with [Slate](https://github.com/slatedocs/slate). Feel free to edit it and use it as a base for your own API's documentation.
+All the examples in the dark area are provided in Python code.
 
 # Authentication
 
-> To authorize, use this code:
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
+> Use bearer token authentication for each API request:
 
 ```python
-import kittn
+import requests
 
-api = kittn.authorize('meowmeowmeow')
+api_key = 'your_api_key'
+headers = { 'Authorization': f'Bearer {api_key}' }
+response = requests.get('https://api.pneumatic.app/some-endpoint', headers=headers)
 ```
 
-```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
-```
 
-```javascript
-const kittn = require('kittn');
+> Make sure to replace `your_api_key` with your API key from [profile page](https://my.pneumatic.app/settings/profile/).
 
-let api = kittn.authorize('meowmeowmeow');
-```
+Pneumatic expects for the API key to be included in all API requests to the server in a header that looks like the following:
 
-> Make sure to replace `meowmeowmeow` with your API key.
-
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
-
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
-
-`Authorization: meowmeowmeow`
+`Authorization: Bearer api_key`
 
 <aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
+You must replace <code>api_key</code> with your personal API key.
 </aside>
 
-# Kittens
+# Workflows
 
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
+## Get All Workflows
 
 ```python
-import kittn
+import requests
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}'
+}
 
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
+r = requests.get('https://api.pneumatic.app/workflows', headers=headers)
 ```
 
 > The above command returns JSON structured like this:
@@ -82,140 +48,249 @@ let kittens = api.kittens.get();
 ```json
 [
   {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
+      "id": 1,
+      "name": "Workflow name",
+      "is_active": true,
+      "description": "Description of this workflow",
+      "performers_count": 3,
+      "tasks_count": 6,
+      "run_allowed": [
+         {
+            "id": 1,
+            "email": "john.doe@example.com",
+            "first_name": "John",
+            "last_name": "Doe",
+            "photo": "https://example.com/avatar.jpeg",
+            "status": "active"
+         }
+      ],
+      "urls": [
+         "trello.com",
+         "gmail.com",
+         "pandadocs.com",
+         "zoom.us",
+         "docusign.com"
+      ],
+      "kickoff": {
+         "id": 1,
+         "description": "Kick-off form description",
+         "fields": [
+            {
+              "name": "Field name",
+              "description": "Field description",
+              "type": "string",
+              "is_required": false, 
+              "api_name": "api-name-1",
+              "selections": []
+            }
+         ]
+      }
   },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
+  ...
 ]
 ```
 
-This endpoint retrieves all kittens.
+This endpoint retrieves all workflows in your account.
 
 ### HTTP Request
 
-`GET http://example.com/api/kittens`
+`GET https://api.pneumatic.app/workflows`
 
 ### Query Parameters
 
 Parameter | Default | Description
 --------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
+ordering | -date | Available values: date, name, -date, -name.
 
 <aside class="success">
-Remember — a happy kitten is an authenticated kitten!
+Minus before the value will sort in descending order.
 </aside>
 
-## Get a Specific Kitten
+## Get a Specific Workflow
 
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
 
 ```python
-import kittn
+import requests
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}'
+}
+workflow_id = 1
 
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
+r = requests.get(f'https://api.pneumatic.app/workflows/{workflow_id}', headers=headers)
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
+    "id": 1,
+    "tasks_count": 6,
+    "name": "Workflow name",
+    "description": "Workflow description",
+    "is_active": false,
+    "finalizable": false,
+    "run_allowed": [
+        {
+            "id": 1,
+            "email": "john.doe@example.com",
+            "first_name": "John",
+            "last_name": "Doe",
+            "photo": "https://example.com/avatar.jpeg",
+            "status": "active"
+        }
+    ],
+    "tasks": [
+        {
+            "id": 1,
+            "name": "Name of the first task of the workflow",
+            "description": "Its description",
+            "number": 1,
+            "responsible": [],
+            "url": null,
+            "require_completion_by_all": false
+        },
+        {
+            "id": 2,
+            "name": "Second step of the process",
+            "description": null,
+            "number": 2,
+            "responsible": [
+                {
+                    "id": 1,
+                    "email": "john.doe@example.com",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "photo": "https://example.com/avatar.jpeg",
+                    "status": "active"
+                }
+            ],
+            "url": "https://www.example.com/",
+            "require_completion_by_all": false
+        },
+        ...
+    ],
+    "kickoff": {
+        "id": 1,
+        "description": "Kick-off description",
+        "fields": [
+            {
+                "name": "Text Field",
+                "type": "string",
+                "is_required": false,
+                "description": "Field description",
+                "api_name": "field-1"
+            },
+            {
+                "name": "Radio Buttons Field",
+                "type": "radio",
+                "is_required": false,
+                "description": "Radio Field Description",
+                "api_name": "radio-field-2",
+                "selections": [
+                    {
+                        "id": 1,
+                        "value": "Option 1"
+                    },
+                    {
+                        "id": 2,
+                        "value": "Option 2"
+                    }
+                ]
+            },
+            {
+                "name": "Checkbox Field",
+                "type": "checkbox",
+                "is_required": false,
+                "description": "",
+                "api_name": "checkbox-field-3",
+                "selections": [
+                    {
+                        "id": 1,
+                        "value": "Option 1"
+                    },
+                    {
+                        "id": 2,
+                        "value": "Option 2"
+                    }
+                ]
+            },
+            ...
+        ]
+    }
 }
 ```
 
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
+This endpoint retrieves a specific workflow.
 
 ### HTTP Request
 
-`GET http://example.com/kittens/<ID>`
+`GET https://api.pneumatic.app/workflows/<ID>`
 
 ### URL Parameters
 
 Parameter | Description
 --------- | -----------
-ID | The ID of the kitten to retrieve
+ID | The ID of the workflow to retrieve
 
-## Delete a Specific Kitten
 
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
-```
+## Launch a Process Based on Specific Workflow
 
 ```python
-import kittn
+import requests
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
-```
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}'
+}
+workflow_id = :workflow_id
+process_info = {
+    'name': 'My Process Name',
+    'kickoff': {
+        'text-field-api-name': 'Text Field Value',
+        'radio-field-api-name': :value_id,
+        'checkbox-field-api-name': [ :value_1_id, :value_2_id ]
+    },
+    'tasks': {
+        :task_id: {
+            'url': 'https://overwritten-url.com/'
+        }    
+    }
+}
 
-```shell
-curl "http://example.com/api/kittens/2"
-  -X DELETE
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
+r = requests.post(
+    f'https://api.pneumatic.app/workflows/{workflow_id}/run', 
+    headers=headers,
+    data=process_info
+)
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-  "id": 2,
-  "deleted" : ":("
+  "process_id": 1
 }
 ```
 
-This endpoint deletes a specific kitten.
+This endpoint launches a new process based on specific workflow.
 
 ### HTTP Request
 
-`DELETE http://example.com/kittens/<ID>`
+`POST https://api.pneumatic.app/workflows/<ID>/run`
 
 ### URL Parameters
 
 Parameter | Description
 --------- | -----------
-ID | The ID of the kitten to delete
+ID | The ID of the workflow to launch
 
+
+### Body Parameters
+
+Parameter | Required | Description
+--------- | --------- | -----------
+name | Yes | The name of the process you'd like to launch
+tasks | No | Used if needed to overwrite some workflow's tasks properties designed by owner. For now, only `url` supported.
+kickoff | Yes if there are required fields in kickoff | Dictionary where the keys are API names of kickoff fields. Checkbox and radio fields take as values IDs of selections. Retrieve a workflow to get these IDs.

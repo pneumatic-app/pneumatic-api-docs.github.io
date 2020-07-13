@@ -328,7 +328,6 @@ html, body {
   }
 
   &>h1, &>h2, &>h3, &>h4, &>h5, &>h6, &>p, &>table, &>ul, &>ol, &>aside, &>dl {
-    margin-right: $examples-width;
     padding: 0 $main-padding;
     box-sizing: border-box;
     display: block;
@@ -521,10 +520,6 @@ html, body {
     color: #fff;
 
     margin: 0;
-    width: $examples-width;
-
-    float:right;
-    clear:right;
 
     box-sizing: border-box;
 
@@ -537,6 +532,11 @@ html, body {
       text-decoration: none;
       border-bottom: dashed 1px #ccc;
     }
+  }
+
+  .highlight + p,
+  blockquote + p {
+    margin-top: 20px;
   }
 
   pre {
