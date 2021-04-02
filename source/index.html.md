@@ -71,13 +71,6 @@ r = requests.get('https://api.pneumatic.app/workflows', headers=headers)
           }
        }
     ],
-    "urls": [
-       "trello.com",
-       "gmail.com",
-       "pandadocs.com",
-       "zoom.us",
-       "docusign.com"
-    ],
     "kickoff": {
        "id": 1,
        "description": "Kick-off form description",
@@ -151,157 +144,81 @@ api_key = 'your_api_key'
 headers = {
   'Authorization': f'Bearer {api_key}'
 }
-workflow_id = 1
+template_id = 1
 
-r = requests.get(f'https://api.pneumatic.app/workflows/{workflow_id}', headers=headers)
+r = requests.get(f'https://api.pneumatic.app/templates/{template_id}', headers=headers)
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-    "id": 1,
-    "draft": null,
-    "tasks_count": 6,
-    "name": "Template name",
-    "description": "Template description", // nullable
-    "is_active": false,
-    "finalizable": false,
-    "date_updated": "2020-12-04T10:02:50.074891+00:00",
-    "updated_by": {
-       "id": 2,
-       "first_name": "John",
-       "last_name": "Doe"
-    },
-    "performers_count": 1
-    "run_allowed": [
-        {
-            "id": 2,
-            "email": "john.doe@example.com",
-            "first_name": "John",
-            "last_name": "Doe",
-            "photo": "https://example.com/avatar.jpeg",
-            "status": "active",
-            "invite": { // nullable
-               "id": "some UUID",
-               "invited_by": 1,
-               "date_created": "2020-04-15T06:50:12.682106Z",
-               "invited_from": "email", // slack, google
-               "by_username": "Pneumatic Owner"
-            }
-        }
-    ],
-    "tasks": [
-        {
-            "id": 1,
-            "name": "Name of the first task of the workflow",
-            "description": "Its description",
-            "number": 1,
-            "responsible": [],
-            "url": null,
-            "require_completion_by_all": false,
-            "delay": null,
-            "is_starter_responsible": true,
-            "output": {
-               "id": 123,
-               "fields": [
-                  {
-                    "name": "Radio Buttons Field",
-                    "type": "radio",
-                    "is_required": false,
-                    "description": "Radio Field Description",
-                    "api_name": "radio-buttons-field-3",
-                    "selections": [
-                      {
-                         "id": 1,
-                         "value": "Option 1"
-                      },
-                      {
-                         "id": 2,
-                         "value": "Option 2"
-                      }
-                    ]
-                  }
-               ]
-            }
-        },
-        {
-            "id": 2,
-            "name": "Second step of the process",
-            "description": null,
-            "number": 2,
-            "delay": "00 01:00:00", // DD HH:mm:ss, nullable
-            "is_starter_responsible": false,
-            "responsible": [
-                {
-                    "id": 1,
-                    "email": "john.doe@example.com",
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "photo": "https://example.com/avatar.jpeg",
-                    "status": "active",
-                    "invite": { // nullable
-                       "id": "some UUID",
-                       "invited_by": 1,
-                       "date_created": "2020-04-15T06:50:12.682106Z",
-                       "invited_from": "email", // slack, google
-                       "by_username": "Pneumatic Owner"
-                     }
-                 }
-            ],
-            "url": "https://www.example.com/",
-            "require_completion_by_all": false
-        },
-        ...
-    ],
-    "kickoff": {
-        "id": 1,
-        "description": "Kick-off description",
-        "fields": [
-            {
-                "name": "Text Field",
-                "type": "string",
-                "is_required": false,
-                "description": "Field description",
-                "api_name": "field-1"
-            },
-            {
-                "name": "Radio Buttons Field",
-                "type": "radio",
-                "is_required": false,
-                "description": "Radio Field Description",
-                "api_name": "radio-field-2",
-                "selections": [
-                    {
-                        "id": 3,
-                        "value": "Option 1"
-                    },
-                    {
-                        "id": 4,
-                        "value": "Option 2"
-                    }
-                ]
-            },
-            {
-                "name": "Checkbox Field",
-                "type": "checkbox",
-                "is_required": false,
-                "description": "",
-                "api_name": "checkbox-field-3",
-                "selections": [
-                    {
-                        "id": 5,
-                        "value": "Option 1"
-                    },
-                    {
-                        "id": 6,
-                        "value": "Option 2"
-                    }
-                ]
-            },
-            ...
+  "id": int,
+  "name": str,
+  "description": str,
+  "is_active": bool,
+  "finalizable": bool, // This workflow can be finished at any stage.
+  "date_updated": str, // format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
+  "updated_by": int, // User who made the last update
+  "run_allowed": [int], // Template owners. Users who can either run or edit it.
+  "tasks_count": int,
+  "performers_count": int,
+  "kickoff": {
+    "id": int, 
+    "description": str, 
+    "fields": [
+      {
+        "id": int,
+        "order": int,
+        "name": str,
+        "type": FieldTypeEnum,
+        "is_required": bool,
+        "description": str,
+        "api_name": str,
+        "selections": [ // Only for radio, checkbox, dropdown
+          {
+            "id": int,
+            "value": str
+          }
         ]
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "id": int,
+      "number": int,
+      "name": str,
+      "description": str,
+      "delay": str,       // null for not specified, format: '[DD] [[hh:]mm:]ss'
+      "require_completion_by_all": bool,
+      "is_starter_responsible": bool, // The workflow runner will be a performer for the task.
+      "responsible": [int], // Assigned performers.
+      "output_responsible": [ // The dynamic performers who will be assigned on the task from the previous tasks' and kickoff's output fields.
+        {
+          "api_name": str,
+          "name": str
+        }
+      ],
+      "fields": [
+    	  {
+          "id": int,
+    	    "order": int,
+    	    "name": str,
+    	    "type": FieldTypeEnum,
+    	    "is_required": bool,
+    	    "description": str,
+          "api_name": str,
+          "selections": [ // Only for radio, checkbox, dropdown
+            {
+              "id": int,
+              "value": str
+            }
+          ]
+        }
+      ]
     }
+  ]
 }
 ```
 
@@ -309,7 +226,7 @@ This endpoint retrieves a specific template.
 
 ### HTTP Request
 
-`GET https://api.pneumatic.app/workflows/<ID>`
+`GET https://api.pneumatic.app/templates/<ID>`
 
 ### URL Parameters
 
@@ -317,7 +234,7 @@ Parameter | Description
 --------- | -----------
 ID | The ID of the template to retrieve
 
-Enum type of kickoff/task field:
+FieldTypeEnum:
 
 - string
 - text
@@ -327,6 +244,7 @@ Enum type of kickoff/task field:
 - url
 - dropdown
 - file
+- user
 
 ## Launch a Workflow Based on Specific Template
 
@@ -337,10 +255,10 @@ api_key = 'your_api_key'
 headers = {
   'Authorization': f'Bearer {api_key}'
 }
-template_id = :template_id
-process_info = {
-  "id": :template_id,
-  "name":"Workflow Name",
+template_id = 1
+workflow_info = {
+  "id": template_id,
+  "name": "Workflow Name",
   "kickoff": { // nullable
     "string-field-1": "Value 1",
     "text-field-2": "Value 2",
@@ -349,14 +267,15 @@ process_info = {
     "radio-field-5": "selection ID",
     "date-field-6": "12/11/2020",
     "file-field-7": ["attachment ID"], 
-    "url-field-8": "https://grave.com/"
+    "url-field-8": "https://grave.com/",
+    "user-field-9": 1 // user id
   }
 }
 
 r = requests.post(
     f'https://api.pneumatic.app/workflows/{template_id}/run', 
     headers=headers,
-    data=process_info
+    data=workflow_info
 )
 ```
 
@@ -664,3 +583,72 @@ Parameter | Description
 --------- | -----------
 target | URL to be removed from webhook listeners.
 
+## Get user list
+
+```python
+import requests
+
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}'
+}
+
+r = requests.get(
+  'https://api.pneumatic.app/accounts/users?offset=0&limit=20', 
+  headers=headers,
+)
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "count": int,
+  "next": str, // nullable
+  "previous": str, // nullable
+  "results": [
+    {
+      "id": int,
+      "email": str,
+      "first_name": str,
+      "last_name": str,
+      "phone": str, // nullable
+      "photo": str, // nullable
+      "status": UserStatusEnum,
+      "is_staff": bool,
+      "is_admin": bool,
+      "is_account_owner": bool,
+      "invite": {
+        "id": str,
+        "by_username": str,
+        "date_created": str, // format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS]
+        "invited_by": int,
+        "invited_from": InvitedFromEnum
+      }
+    }
+  ]
+}
+```
+
+UserStatusEnum:
+
+- active
+- invited
+
+InvitedFromEnum:
+
+- email
+- google
+- slack
+
+### HTTP Request
+
+`GET https://api.pneumatic.app/accounts/users`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+limit | Use for pagination.
+offset | Use for pagination.
+order | asc\desc
