@@ -30,7 +30,8 @@ You must replace <code>api_key</code> with your personal API key.
 
 # Templates
 
-## Get All Templates
+## Get All Templates (Deprecated)
+Use [this api](#template-list) instead
 
 ```python
 import requests
@@ -110,6 +111,111 @@ This endpoint retrieves all templates in your account.
 ### HTTP Request
 
 `GET https://api.pneumatic.app/workflows`
+
+### Query Parameters
+
+Parameter | Default | Description
+--------- | ------- | -----------
+ordering | -date | Available values: date, name, -date, -name.
+limit | 20  | Use for pagination
+offset | 0  | Use for pagination
+
+<aside class="success">
+Minus before the value will sort in descending order.
+</aside>
+
+If request contains limit/offset parameters then response will have structure like this:
+
+```json
+{
+  "count": 123,
+  "next": "next page link", // If this is the last page then "next" is null
+  "previous": "prev page link", // If this is the first page then "previous" is null
+  "results": [...] // list of templates
+}
+```
+
+## Get All Templates (New)
+<a id="template-list"></a> 
+
+```python
+import requests
+
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}'
+}
+
+r = requests.get('https://api.pneumatic.app/templates', headers=headers)
+```
+
+> The above command returns JSON structured like this:
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Template name",
+    "is_active": true,
+    "description": "Description of this template",
+    "performers_count": 3,
+    "tasks_count": 6,
+    "run_allowed": [
+       {
+          "id": 2,
+          "email": "john.doe@example.com",
+          "first_name": "John",
+          "last_name": "Doe",
+          "photo": "https://example.com/avatar.jpeg",
+          "status": "active",
+          "invite": { // nullable
+             "id": "some UUID",
+             "invited_by": 1,
+             "date_created": "2020-04-15T06:50:12.682106Z",
+             "invited_from": "email", // slack, google
+             "by_username": "Pneumatic Owner"
+          }
+       }
+    ],
+    "kickoff": {
+       "id": 1,
+       "description": "Kick-off form description",
+       "fields": [
+          {
+            "name": "Field name",
+            "description": "Field description",
+            "type": "string",
+            "is_required": false, 
+            "api_name": "field-name-1",
+            "selections": [],
+            "order": 1
+          },
+          {
+            "name": "Checkbox Field",
+            "description": "Field description",
+            "type": "checkbox",
+            "is_required": false, 
+            "api_name": "checkbox-field-2",
+            "selections": [
+              {"id": 1, "value": "checkbox value 1"},
+              {"id": 2, "value": "checkbox value 2"},
+              {"id": 3, "value": "checkbox value 3"}
+            ],
+            "order": 0
+          }
+       ]
+    },
+    "first_task_responsible": [1]
+  },
+  ...
+]
+```
+
+This endpoint retrieves all templates in your account.
+
+### HTTP Request
+
+`GET https://api.pneumatic.app/templates`
 
 ### Query Parameters
 
@@ -246,7 +352,8 @@ FieldTypeEnum:
 - file
 - user
 
-## Launch a Workflow Based on Specific Template
+## Launch a Workflow Based on Specific Template (Deprecated)
+Use [this api](#workflow-run) instead
 
 ```python
 import requests
@@ -292,6 +399,70 @@ This endpoint launches a new workflow based on specific template.
 ### HTTP Request
 
 `POST https://api.pneumatic.app/workflows/<ID>/run`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+ID | The ID of the template to launch
+
+
+### Body Parameters
+
+Parameter | Required | Description
+--------- | --------- | -----------
+name | Yes | The name of the workflow you'd like to launch
+tasks | No | Used if needed to overwrite some template's tasks properties designed by owner. For now, only `url` supported.
+kickoff | Yes if there are required fields in kickoff | Dictionary where the keys are API names of kickoff fields. Checkbox and radio fields take as values IDs of selections. Retrieve a template to get these IDs.
+
+
+## Launch a Workflow Based on Specific Template (New)
+<a id="workflow-run"></a> 
+
+```python
+import requests
+
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}'
+}
+template_id = 1
+workflow_info = {
+  "id": template_id,
+  "name": "Workflow Name",
+  "kickoff": { // nullable
+    "string-field-1": "Value 1",
+    "text-field-2": "Value 2",
+    "dropdown-field-3": "selection ID",
+    "checkbox-field-4":["selection ID", ...],
+    "radio-field-5": "selection ID",
+    "date-field-6": "12/11/2020",
+    "file-field-7": ["attachment ID", ...], 
+    "url-field-8": "https://grave.com/",
+    "user-field-9": 1 // user id
+  }
+}
+
+r = requests.post(
+    f'https://api.pneumatic.app/templates/{template_id}/run', 
+    headers=headers,
+    data=workflow_info
+)
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "workflow_id": 1
+}
+```
+
+This endpoint launches a new workflow based on specific template.
+
+### HTTP Request
+
+`POST https://api.pneumatic.app/templates/<ID>/run`
 
 ### URL Parameters
 
@@ -413,175 +584,7 @@ ID | The ID of the attachment
 You have to make your file public. Otherwise, nobody can watch it.
 
 
-
-# Webhooks
-
-## Get All Webhooks
-
-```python
-import requests
-
-api_key = 'your_api_key'
-headers = {
-  'Authorization': f'Bearer {api_key}'
-}
-
-r = requests.get('https://api.pneumatic.app/webhooks', headers=headers)
-```
-
-> The above command returns JSON structured like this:
-
-```json
-[
-  {
-    "id": 1,
-    "created": "datetime",
-    "updated": "datetime",
-    "event": "task_completed",
-    "target": "https://webhook.com/listener-url"
-  },
-  {
-    "id": 2,
-    "created": "datetime",
-    "updated": "datetime",
-    "event": "process_started",
-    "target": "https://webhook.com/listener-url-2"
-  },
-  ...
-]
-```
-
-This endpoint retrieves all active webhooks in your account.
-
-### HTTP Request
-
-`GET https://api.pneumatic.app/webhooks`
-
-<aside class="notice">
-Events available: task_completed, process_started, process_completed.
-</aside>
-
-
-## Subscribe
-
-```python
-import requests
-
-api_key = 'your_api_key'
-headers = {
-  'Authorization': f'Bearer {api_key}'
-}
-payload = {
-  'target': 'your_webhook_listener_url',
-  'event': 'event_name'
-}
-
-r = requests.post(
-  'https://api.pneumatic.app/webhooks', 
-  headers=headers,
-  data=payload
-)
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 1,
-  "created": "datetime",
-  "updated": "datetime",
-  "event": "event_name",
-  "target": "your_webhook_listener_url"
-}
-```
-
-This endpoint creates a new webhook subscription.
-
-### HTTP Request
-
-`POST https://api.pneumatic.app/webhooks`
-
-### Body Parameters
-
-Parameter | Description
---------- | -----------
-target | URL to create a new webhook subscription
-event | Available values: process_started, task_completed, process_completed.
-
-<aside class="notice">
-All parameters are mandatory.
-</aside>
-
-
-## Unsubscribe by Webhook ID
-
-```python
-import requests
-
-api_key = 'your_api_key'
-headers = {
-  'Authorization': f'Bearer {api_key}'
-}
-
-r = requests.delete(
-  'https://api.pneumatic.app/webhooks/:id', headers=headers
-)
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "ok": true
-}
-```
-
-This endpoint deletes an existing webhook subscription.
-
-### HTTP Request
-
-`DELETE https://api.pneumatic.app/webhooks/:id`
-
-
-## Unsubscribe by Target URL
-
-```python
-import requests
-
-api_key = 'your_api_key'
-headers = {
-  'Authorization': f'Bearer {api_key}'
-}
-payload = {
-  'target': 'your_webhook_listener_url',
-}
-
-r = requests.delete(
-  'https://api.pneumatic.app/webhooks/target', 
-  headers=headers,
-  data=payload
-)
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "ok": true
-}
-```
-
-This endpoint deletes an existing webhook subscription.
-
-### HTTP Request
-
-`DELETE https://api.pneumatic.app/webhooks/target`
-
-### Body Parameters
-
-Parameter | Description
---------- | -----------
-target | URL to be removed from webhook listeners.
+# Users
 
 ## Get user list
 
@@ -652,3 +655,395 @@ Parameter | Description
 limit | Use for pagination.
 offset | Use for pagination.
 order | asc\desc
+
+
+# Webhooks
+
+## Get All Webhooks
+
+```python
+import requests
+
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}'
+}
+
+r = requests.get('https://api.pneumatic.app/webhooks', headers=headers)
+```
+
+> The above command returns JSON structured like this:
+
+```json
+[
+  {
+    "id": 1,
+    "created": "datetime",
+    "updated": "datetime",
+    "event": "task_completed_v2",
+    "target": "https://webhook.com/listener-url"
+  },
+  {
+    "id": 2,
+    "created": "datetime",
+    "updated": "datetime",
+    "event": "workflow_started",
+    "target": "https://webhook.com/listener-url-2"
+  },
+  ...
+]
+```
+
+This endpoint retrieves all active webhooks in your account.
+
+### HTTP Request
+
+`GET https://api.pneumatic.app/webhooks`
+
+Available events:
+
+- task_completed_v2
+- task_returned
+- workflow_started
+- workflow_completed
+- task_completed (<b>Deprecated</b>) 
+- process_started (<b>Deprecated</b>) 
+- process_completed (<b>Deprecated</b>)
+
+## Subscribe
+
+```python
+import requests
+
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}'
+}
+payload = {
+  'target': 'your_webhook_listener_url',
+  'event': 'event_name'
+}
+
+r = requests.post(
+  'https://api.pneumatic.app/webhooks', 
+  headers=headers,
+  data=payload
+)
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "id": 1,
+  "created": "datetime",
+  "updated": "datetime",
+  "event": "event_name",
+  "target": "your_webhook_listener_url"
+}
+```
+
+This endpoint creates a new webhook subscription.
+
+### HTTP Request
+
+`POST https://api.pneumatic.app/webhooks`
+
+### Body Parameters
+
+Parameter | Description
+--------- | -----------
+target | URL to create a new webhook subscription
+event | Available values: task_completed (Deprecated), process_started (Deprecated), process_completed (Deprecated), task_completed_v2, task_returned, workflow_started, workflow_completed
+
+<aside class="notice">
+All parameters are mandatory.
+</aside>
+
+## Unsubscribe by Webhook ID
+
+```python
+import requests
+
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}'
+}
+
+r = requests.delete(
+  'https://api.pneumatic.app/webhooks/:id', headers=headers
+)
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "ok": true
+}
+```
+
+This endpoint deletes an existing webhook subscription.
+
+### HTTP Request
+
+`DELETE https://api.pneumatic.app/webhooks/:id`
+
+## Unsubscribe by Target URL
+
+```python
+import requests
+
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}'
+}
+payload = {
+  'target': 'your_webhook_listener_url',
+}
+
+r = requests.delete(
+  'https://api.pneumatic.app/webhooks/target', 
+  headers=headers,
+  data=payload
+)
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "ok": true
+}
+```
+
+This endpoint deletes an existing webhook subscription.
+
+### HTTP Request
+
+`DELETE https://api.pneumatic.app/webhooks/target`
+
+### Body Parameters
+
+Parameter | Description
+--------- | -----------
+target | URL to be removed from webhook listeners.
+
+## Task Completed Webhook Event Schema
+<a id="task-completed-webhook"></a>
+
+`event: task_completed_v2`
+
+```json
+{
+  "hook": {
+    "id": 1,
+    "event": "task_completed_v2",
+    "target": "your_webhook_listener_url"
+  },
+  "task": {
+    "id": 1,
+    "name": "Task name",
+    "description": "Task description",
+    "number": 1,
+    "date_started": "2020-10-12T16:25:00.062Z",
+    "date_completed": "2020-10-12T16:25:58.675Z",
+    "output": [
+      {
+        "id": 1,
+        "name": "Performer",
+        "type": "user",
+        "api_name": "field-shdgkk",
+        "value": "1",
+        "is_required": true,
+        "selections": [],
+        "attachments": []
+      },
+      {
+        "id": 2,
+        "name": "Label",
+        "type": "radiobutton",
+        "api_name": "field-asdsfd",
+        "value": null,
+        "is_required": true,
+        "selections": [
+          {
+            "id": 1,
+            "value": "First Selection",
+            "is_selected": false
+          },
+          {
+            "id": 2,
+            "value": "Second Selection",
+            "is_selected": true
+          }
+        ],
+        "attachments": []
+      },
+      {
+        "id": 3,
+        "name": "File",
+        "type": "file",
+        "api_name": "field-cvkjbk",
+        "value": null,
+        "is_required": true,
+        "selections": [],
+        "attachments": [
+          {
+            "id": 1,
+            "name": "filename.png",
+            "url": "https://fake-url.com"
+          }
+        ]
+      }
+    ],
+    "performers": [
+      {
+        "id": 1,
+        "first_name": "John",
+        "last_name": "Doe"
+      }
+    ],
+    "workflow": {
+      "id": 1,
+      "name": "Workflow Name",
+      "status": 1,
+      "date_created": "2020-10-12T16:12:10.099Z",
+      "template": {
+        "id": 1,
+        "name": "Template name"
+      },
+      "kickoff": {
+        "id": 1,
+        "description": "Kickoff description",
+        "output": []
+      },
+      "current_task": {
+        "id": 2,
+        "name": "Second task",
+        "description": "Task description",
+        "number": 2,
+        "date_started": "2020-10-12T16:25:00.062Z",
+        "date_completed": "2020-10-12T16:25:58.675Z",
+        "performers": [
+          {
+            "id": 2,
+            "first_name": "John Jr.",
+            "last_name": "Doe"
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+## Task Returned Webhook Event Schema
+<a id="task-returned-webhook"></a>
+`event: task_returned`
+
+See [Task Completed Webhook Event Schema](#task-completed-webhook)
+## Workflow Started Webhook Event Schema
+<a id="workflow-started-webhook"></a>
+`event: workflow_started`
+
+```json
+{
+  "hook": {
+    "id": 1,
+    "event": "workflow_started",
+    "target": "your_webhook_listener_url"
+  },
+  "workflow": {
+    "id": 1,
+    "name": "Workflow Name",
+    "status": 1,
+    "date_created": "2020-10-12T16:12:10.099Z",
+    "template": {
+      "id": 1,
+      "name": "Template name"
+    },
+    "kickoff": {
+      "id": 1,
+      "description": "Kickoff description",
+      "output": [
+        {
+          "id": 1,
+          "name": "Performer",
+          "type": "user",
+          "api_name": "field-shdgkk",
+          "value": "1",
+          "is_required": true,
+          "selections": [],
+          "attachments": []
+        },
+        {
+          "id": 2,
+          "name": "Label",
+          "type": "radiobutton",
+          "api_name": "field-asdsfd",
+          "value": null,
+          "is_required": true,
+          "selections": [
+            {
+              "id": 1,
+              "value": "First Selection",
+              "is_selected": false
+            },
+            {
+              "id": 2,
+              "value": "Second Selection",
+              "is_selected": true
+            }
+          ],
+          "attachments": []
+        },
+        {
+          "id": 3,
+          "name": "File",
+          "type": "file",
+          "api_name": "field-cvkjbk",
+          "value": null,
+          "is_required": true,
+          "selections": [],
+          "attachments": [
+            {
+              "id": 1,
+              "name": "filename.png",
+              "url": "https://fake-url.com"
+            }
+          ]
+        }
+      ]
+    },
+    "current_task": {
+      "id": 2,
+      "name": "Second task",
+      "description": "Task description",
+      "number": 2,
+      "date_started": "2020-10-12T16:25:00.062Z",
+      "date_completed": "2020-10-12T16:25:58.675Z",
+      "performers": [
+        {
+          "id": 2,
+          "first_name": "John Jr.",
+          "last_name": "Doe"
+        }
+      ]
+    }
+  }
+}
+```
+
+Available workflow statuses:
+
+- 0 - Running
+- 1 - Completed
+- 2 - Terminated
+- 3 - Snoozed
+
+## Workflow Completed Webhook Event Schema
+<a id="workflow-completed-webhook"></a>
+`event: workflow_completed`
+
+See [Workflow Started Webhook Event Schema](#workflow-started-webhook)
