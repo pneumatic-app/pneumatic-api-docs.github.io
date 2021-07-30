@@ -30,112 +30,7 @@ You must replace <code>api_key</code> with your personal API key.
 
 # Templates
 
-## Get All Templates (Deprecated)
-Use [this api](#template-list) instead
-
-```python
-import requests
-
-api_key = 'your_api_key'
-headers = {
-  'Authorization': f'Bearer {api_key}'
-}
-
-r = requests.get('https://api.pneumatic.app/workflows', headers=headers)
-```
-
-> The above command returns JSON structured like this:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Template name",
-    "is_active": true,
-    "description": "Description of this template",
-    "performers_count": 3,
-    "tasks_count": 6,
-    "run_allowed": [
-       {
-          "id": 2,
-          "email": "john.doe@example.com",
-          "first_name": "John",
-          "last_name": "Doe",
-          "photo": "https://example.com/avatar.jpeg",
-          "status": "active",
-          "invite": { // nullable
-             "id": "some UUID",
-             "invited_by": 1,
-             "date_created": "2020-04-15T06:50:12.682106Z",
-             "invited_from": "email", // slack, google
-             "by_username": "Pneumatic Owner"
-          }
-       }
-    ],
-    "kickoff": {
-       "id": 1,
-       "description": "Kick-off form description",
-       "fields": [
-          {
-            "name": "Field name",
-            "description": "Field description",
-            "type": "string",
-            "is_required": false, 
-            "api_name": "field-name-1",
-            "selections": [],
-            "order": 1
-          },
-          {
-            "name": "Checkbox Field",
-            "description": "Field description",
-            "type": "checkbox",
-            "is_required": false, 
-            "api_name": "checkbox-field-2",
-            "selections": [
-              {"id": 1, "value": "checkbox value 1"},
-              {"id": 2, "value": "checkbox value 2"},
-              {"id": 3, "value": "checkbox value 3"},
-            ],
-            "order": 0
-          }
-       ]
-    },
-    "first_task_responsible": [1]
-  },
-  ...
-]
-```
-
-This endpoint retrieves all templates in your account.
-
-### HTTP Request
-
-`GET https://api.pneumatic.app/workflows`
-
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-ordering | -date | Available values: date, name, -date, -name.
-limit | 20  | Use for pagination
-offset | 0  | Use for pagination
-
-<aside class="success">
-Minus before the value will sort in descending order.
-</aside>
-
-If request contains limit/offset parameters then response will have structure like this:
-
-```json
-{
-  "count": 123,
-  "next": "next page link", // If this is the last page then "next" is null
-  "previous": "prev page link", // If this is the first page then "previous" is null
-  "results": [...] // list of templates
-}
-```
-
-## Get All Templates (New)
+## Get All Templates
 <a id="template-list"></a> 
 
 ```python
@@ -352,71 +247,7 @@ FieldTypeEnum:
 - file
 - user
 
-## Launch a Workflow Based on Specific Template (Deprecated)
-Use [this api](#workflow-run) instead
-
-```python
-import requests
-
-api_key = 'your_api_key'
-headers = {
-  'Authorization': f'Bearer {api_key}'
-}
-template_id = 1
-workflow_info = {
-  "id": template_id,
-  "name": "Workflow Name",
-  "kickoff": { // nullable
-    "string-field-1": "Value 1",
-    "text-field-2": "Value 2",
-    "dropdown-field-3": "selection ID",
-    "checkbox-field-4":["selection ID", "one more selection ID"],
-    "radio-field-5": "selection ID",
-    "date-field-6": "12/11/2020",
-    "file-field-7": ["attachment ID"], 
-    "url-field-8": "https://grave.com/",
-    "user-field-9": 1 // user id
-  }
-}
-
-r = requests.post(
-    f'https://api.pneumatic.app/workflows/{template_id}/run', 
-    headers=headers,
-    data=workflow_info
-)
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "process_id": 1
-}
-```
-
-This endpoint launches a new workflow based on specific template.
-
-### HTTP Request
-
-`POST https://api.pneumatic.app/workflows/<ID>/run`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the template to launch
-
-
-### Body Parameters
-
-Parameter | Required | Description
---------- | --------- | -----------
-name | Yes | The name of the workflow you'd like to launch
-tasks | No | Used if needed to overwrite some template's tasks properties designed by owner. For now, only `url` supported.
-kickoff | Yes if there are required fields in kickoff | Dictionary where the keys are API names of kickoff fields. Checkbox and radio fields take as values IDs of selections. Retrieve a template to get these IDs.
-
-
-## Launch a Workflow Based on Specific Template (New)
+## Launch a Workflow Based on Specific Template
 <a id="workflow-run"></a> 
 
 ```python
@@ -498,7 +329,7 @@ file_info = {
 }
 
 attachment_info = requests.post(
-    'https://api.pneumatic.app/processes/attachments', 
+    'https://api.pneumatic.app/workflows/attachments', 
     headers=headers,
     data=file_info,
 ).json()
@@ -506,7 +337,7 @@ attachment_info = requests.post(
 
 ### HTTP Request
 
-`POST https://api.pneumatic.app/processes/attachments`
+`POST https://api.pneumatic.app/workflows/attachments`
 
 ### Body Parameters
 
@@ -554,14 +385,14 @@ headers = {
 attachment_id = 123
 
 r = requests.post(
-    f'https://api.pneumatic.app/processes/attachments/{attachment_id}/links', 
+    f'https://api.pneumatic.app/workflows/attachments/{attachment_id}/links', 
     headers=headers,
 )
 ```
 
 ### HTTP Request
 
-`POST https://api.pneumatic.app/processes/attachments/<ID>/links`
+`POST https://api.pneumatic.app/workflows/attachments/<ID>/links`
 
 ### URL Parameters
 
@@ -706,9 +537,6 @@ Available events:
 - task_returned
 - workflow_started
 - workflow_completed
-- task_completed (<b>Deprecated</b>) 
-- process_started (<b>Deprecated</b>) 
-- process_completed (<b>Deprecated</b>)
 
 ## Subscribe
 
