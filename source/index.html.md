@@ -18,7 +18,7 @@ response = requests.get('https://api.pneumatic.app/some-endpoint', headers=heade
 ```
 
 
-> Make sure to replace `your_api_key` with your API key from [profile page](https://my.pneumatic.app/settings/profile/).
+> Make sure to replace `your_api_key` with your API key from [Integrations page](https://my.pneumatic.app/integrations/).
 
 Pneumatic expects for the API key to be included in all API requests to the server in a header that looks like the following:
 
@@ -251,11 +251,13 @@ FieldTypeEnum:
 <a id="workflow-run"></a> 
 
 ```python
+import json
 import requests
 
 api_key = 'your_api_key'
 headers = {
-  'Authorization': f'Bearer {api_key}'
+  'Authorization': f'Bearer {api_key}',
+  'Content-Type': 'application/json'
 }
 template_id = 1
 workflow_info = {
@@ -267,17 +269,18 @@ workflow_info = {
     "dropdown-field-3": "selection ID",
     "checkbox-field-4":["selection ID", ...],
     "radio-field-5": "selection ID",
-    "date-field-6": "12/11/2020",
+    "date-field-6": "date in ISO format",
     "file-field-7": ["attachment ID", ...], 
     "url-field-8": "https://grave.com/",
     "user-field-9": 1 // user id
   }
 }
 
+json_data = json.dumps(workflow_info)
 r = requests.post(
     f'https://api.pneumatic.app/templates/{template_id}/run', 
     headers=headers,
-    data=workflow_info
+    data=json_data,
 )
 ```
 
@@ -314,19 +317,21 @@ kickoff | Yes if there are required fields in kickoff | Dictionary where the key
 ## Upload file for attachment
 
 ```python
+import json
 import requests
 
 api_key = 'your_api_key'
 content_type = 'image/png'
 headers = {
-  'Authorization': f'Bearer {api_key}'
+  'Authorization': f'Bearer {api_key}',
+  'Content-Type': 'application/json',
 }
-file_info = {
+file_info = json.dumps({
    'filename': 'pic.png',
-   'thumbnail': true,
+   'thumbnail': True,
    'content_type': content_type,
    'size': 103613
-}
+})
 
 attachment_info = requests.post(
     'https://api.pneumatic.app/workflows/attachments', 
@@ -379,7 +384,7 @@ import requests
 
 api_key = 'your_api_key'
 headers = {
-  'Authorization': f'Bearer {api_key}'
+  'Authorization': f'Bearer {api_key}',
 }
 
 attachment_id = 123
