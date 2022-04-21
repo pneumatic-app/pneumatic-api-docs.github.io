@@ -1,4 +1,3 @@
-
 # Introduction
 
 Welcome to the Pneumatic API! You can use our API to access Pneumatic public API endpoints, which can get information on templates and run workflows.
@@ -7,31 +6,27 @@ All the examples in the dark area are provided in Python code.
 
 # Authentication
 
-> Use bearer token authentication for each API request:
-
 ```python
 import requests
 
-api_key = 'your_api_key'
+api_key = 'api_key'
 headers = { 'Authorization': f'Bearer {api_key}' }
 response = requests.get('https://api.pneumatic.app/some-endpoint', headers=headers)
 ```
-
-
-> Make sure to replace `your_api_key` with your API key from [Integrations page](https://my.pneumatic.app/integrations/).
-
 Pneumatic expects for the API key to be included in all API requests to the server in a header that looks like the following:
 
 `Authorization: Bearer api_key`
 
 <aside class="notice">
-You must replace <code>api_key</code> with your personal API key.
+You must replace <code>api_key</code> with your personal API key from <a href="https://my.pneumatic.app/integrations/">Integrations page</a>.
 </aside>
+
+Use bearer token authentication for each API request.
 
 # Templates
 
 ## Get All Templates
-<a id="template-list"></a> 
+<a id="template-list"></a>
 
 ```python
 import requests
@@ -106,6 +101,16 @@ r = requests.get('https://api.pneumatic.app/templates', headers=headers)
 ]
 ```
 
+> If request contains limit/offset parameters then response will have structure like this:
+
+```json
+{
+  "count": 123,
+  "next": "next page link", // If this is the last page then "next" is null
+  "previous": "prev page link", // If this is the first page then "previous" is null
+  "results": [...] // list of templates
+}
+```
 This endpoint retrieves all templates in your account.
 
 ### HTTP Request
@@ -124,19 +129,8 @@ offset | 0  | Use for pagination
 Minus before the value will sort in descending order.
 </aside>
 
-If request contains limit/offset parameters then response will have structure like this:
-
-```json
-{
-  "count": 123,
-  "next": "next page link", // If this is the last page then "next" is null
-  "previous": "prev page link", // If this is the first page then "previous" is null
-  "results": [...] // list of templates
-}
-```
-
 ## Get a Specific Template
-
+<a id="get-template"></a>
 
 ```python
 import requests
@@ -247,6 +241,95 @@ FieldTypeEnum:
 - file
 - user
 
+## Upload file for attachment
+
+```python
+import json
+import requests
+
+api_key = 'your_api_key'
+content_type = 'image/png'
+headers = {
+  'Authorization': f'Bearer {api_key}',
+  'Content-Type': 'application/json',
+}
+file_info = json.dumps({
+   'filename': 'pic.png',
+   'thumbnail': True,
+   'content_type': content_type,
+   'size': 103613
+})
+
+attachment_info = requests.post(
+    'https://api.pneumatic.app/workflows/attachments', 
+    headers=headers,
+    data=file_info,
+).json()
+
+r = requests.put(
+    attachment_info['file_upload_url'],
+    data=open('file', 'rb'), 
+    headers=headers,
+)
+```
+
+### HTTP Request
+
+`POST https://api.pneumatic.app/workflows/attachments`
+
+### Body Parameters
+
+Parameter | Required | Description
+--------- | --------- | -----------
+filename  | Yes |
+content_type  | Yes | Header is used to indicate the media type of the resource (e.g. `image/png`)
+size  | Yes | Size of file (less than 104857600 bytes)
+thumbnail | No  | Boolean. Set `true` if you'd like to upload thumbnail image
+
+## Make file public
+
+```python
+import requests
+
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}',
+}
+
+attachment_id = 123
+
+r = requests.post(
+    f'https://api.pneumatic.app/workflows/attachments/{attachment_id}/links', 
+    headers=headers,
+)
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+  "id": 1,
+  "name": "file_name",
+  "url": "url",
+  "thumbnail_url": "thumb_url",
+  "size": 103613
+}
+```
+
+You have to make your file public. Otherwise, nobody can watch it.
+
+### HTTP Request
+
+`POST https://api.pneumatic.app/workflows/attachments/<ID>/links`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+ID | The ID of the attachment
+
+# Workflows
+
 ## Launch a Workflow Based on Specific Template
 <a id="workflow-run"></a> 
 
@@ -314,111 +397,217 @@ tasks | No | Used if needed to overwrite some template's tasks properties design
 kickoff | Yes if there are required fields in kickoff | Dictionary where the keys are API names of kickoff fields. Checkbox and radio fields take as values IDs of selections. Retrieve a template to get these IDs.
 
 
-## Upload file for attachment
+## Get Workflows fields data
+<a id="workflow-fields"></a>
 
 ```python
-import json
 import requests
 
 api_key = 'your_api_key'
-content_type = 'image/png'
 headers = {
   'Authorization': f'Bearer {api_key}',
-  'Content-Type': 'application/json',
 }
-file_info = json.dumps({
-   'filename': 'pic.png',
-   'thumbnail': True,
-   'content_type': content_type,
-   'size': 103613
-})
 
-attachment_info = requests.post(
-    'https://api.pneumatic.app/workflows/attachments', 
+r = requests.get(
+    f'https://api.pneumatic.app/workflows/fields', 
     headers=headers,
-    data=file_info,
-).json()
+    params={
+      'template_id': 1,
+      'status': 'done',
+      'fields': 'field-1,field-2,field-3',
+      'limit': 15,
+      'offset': 0
+    }
+)
 ```
-
-### HTTP Request
-
-`POST https://api.pneumatic.app/workflows/attachments`
-
-### Body Parameters
-
-Parameter | Required | Description
---------- | --------- | -----------
-filename  | Yes |
-content_type  | Yes | Header is used to indicate the media type of the resource (e.g. `image/png`)
-size  | Yes | Size of file (less than 104857600 bytes)
-thumbnail | No  | Boolean. Set `true` if you'd like to upload thumbnail image
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-  "id": 1,  // Use it where you need to attach your file
-  "file_upload_url": "url",
-  "thumbnail_upload_url": "thumb_url" // nullable
+  "count": int,
+  "next": str?, // link to the next page
+  "previous": str?, // link to the previous page
+  "results":[ 
+    {
+      "id": str, 
+      "name": str, 
+      "status": str, 
+      "date_created": str, // format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
+      "date_completed": str, // format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
+      "fields": [
+        {
+          "id": int, 
+          "task_id": int | null,
+          "kickoff_id": int | null,
+          "type": str, // string|text|radio|checkbox|date|url|dropdown|file|user
+          "api_name": str, 
+          "name": str,
+          "value": str,
+          "attachments": [
+            {
+              "id": int,
+              "name": str,
+              "url": str
+            }
+          ],
+          "selections": [
+            {
+              "id": int,
+              "api_name": str,
+              "value": str,
+              "is_selected": bool
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
-`PUT` your file to `file_upload_url` with `content-type` like in previous request
-
-```python
-headers = {
-  'Content-type': content_type,
-}
-
-r = requests.put(
-    attachment_info['file_upload_url'],
-    data=open('file', 'rb'), 
-    headers=headers,
-)
-```
-
-## Make file public
-
-```python
-import requests
-
-api_key = 'your_api_key'
-headers = {
-  'Authorization': f'Bearer {api_key}',
-}
-
-attachment_id = 123
-
-r = requests.post(
-    f'https://api.pneumatic.app/workflows/attachments/{attachment_id}/links', 
-    headers=headers,
-)
-```
+This endpoint returns workflows fields data based on specific template.
 
 ### HTTP Request
 
-`POST https://api.pneumatic.app/workflows/attachments/<ID>/links`
+`GET https://api.pneumatic.app/workflows/fields`
 
 ### URL Parameters
 
-Parameter | Description
---------- | -----------
-ID | The ID of the attachment
+Parameter | Required | Description
+--------- | -------- | -----------
+template_id | yes |The ID of the template
+status | no | Workflows status.<br> Possible values: `running`, `delayed`, `done`
+fields | no | List of `api_name` task/kickoff fields separated by `,`.<br> For example: `field-1,field-2`<br> You can take api_names from [Get a Specific Template API](#get-template) 
+limit | no | Size of page. Default value is 15
+offset | no | Number of page. Default value is 0
+
+# Tasks
+
+## Get a task list
+<a id="get-task-list"></a>
+
+```python
+import requests
+
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}',
+}
+
+r = requests.get(
+    f'https://api.pneumatic.app/v3/tasks?assigned_to=<user_id>', 
+    headers=headers,
+)
+```
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-  "id": 1,
-  "name": "file_name",
-  "url": "url",
-  "thumbnail_url": "thumb_url",
-  "size": 103613
+  "count": int,
+  "next": str?, // link to the next page
+  "previous": str?, // link to the previous page
+  "results":[
+    {
+      "id": str,
+      "name": str,
+      "workflow_name": str,
+      "estimated_end_date": str?, // null if task doesn't have 'due_in'. Format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
+      "template_id": int,
+      "template_task_id": int,
+      "is_urgent": bool
+    }
+  ]
 }
 ```
 
-You have to make your file public. Otherwise, nobody can watch it.
+This endpoint returns running tasks assigned to specified user.
 
+### HTTP Request
+
+`GET https://api.pneumatic.app/v3/tasks`
+
+### URL Parameters
+
+Parameter | Required | Description
+--------- | -------- | -----------
+assigned_to | no | User id assigned to tasks 
+limit | no | Size of page
+offset | no | Number of page
+
+## Get  task
+<a id="get-specific-task"></a>
+
+```python
+import requests
+
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}',
+}
+
+r = requests.get(
+    f'https://api.pneumatic.app/v2/tasks/<id>', 
+    headers=headers,
+)
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+   "id": int,
+   "name": str,
+   "description": str,
+   "date_started": str,
+   "date_completed": null | str,
+   "estimated_end_date": null | str,
+   "is_completed": bool,
+   "is_urgent": bool,
+   "require_completion_by_all": bool,
+   "performers": [int], // users ids
+   "delay": null | {
+     "id": int,
+     "duration": str,
+     "start_date": str,
+     "end_date": str,
+     "estimated_end_date": str
+   },
+   "output": [
+     {
+      "id": int, 
+      "task_id": int | null,
+      "kickoff_id": int | null,
+      "type": str, // string|text|radio|checkbox|date|url|dropdown|file|user
+      "api_name": str, 
+      "name": str,
+      "value": str,
+      "attachments": [
+        {
+          "id": int,
+          "name": str,
+          "url": str
+        }
+      ],
+      "selections": [
+        {
+          "id": int,
+          "api_name": str,
+          "value": str,
+          "is_selected": bool
+        }
+      ]
+    }
+   ]
+}
+```
+
+This endpoint returns a specified task.
+
+### HTTP Request
+
+`GET https://api.pneumatic.app/v2/tasks/<id>`
 
 # Users
 
@@ -469,17 +658,6 @@ r = requests.get(
 }
 ```
 
-UserStatusEnum:
-
-- active
-- invited
-
-InvitedFromEnum:
-
-- email
-- google
-- slack
-
 ### HTTP Request
 
 `GET https://api.pneumatic.app/accounts/users`
@@ -492,6 +670,16 @@ limit | Use for pagination.
 offset | Use for pagination.
 order | asc\desc
 
+UserStatusEnum:
+
+- active
+- invited
+
+InvitedFromEnum:
+
+- email
+- google
+- slack
 
 # Webhooks
 
@@ -665,8 +853,6 @@ target | URL to be removed from webhook listeners.
 ## Task Completed Webhook Event Schema
 <a id="task-completed-webhook"></a>
 
-`event: task_completed_v2`
-
 ```json
 {
   "hook": {
@@ -771,14 +957,16 @@ target | URL to be removed from webhook listeners.
 }
 ```
 
+`event: task_completed_v2`
+
 ## Task Returned Webhook Event Schema
 <a id="task-returned-webhook"></a>
+
 `event: task_returned`
 
 See [Task Completed Webhook Event Schema](#task-completed-webhook)
 ## Workflow Started Webhook Event Schema
 <a id="workflow-started-webhook"></a>
-`event: workflow_started`
 
 ```json
 {
@@ -867,6 +1055,8 @@ See [Task Completed Webhook Event Schema](#task-completed-webhook)
   }
 }
 ```
+
+`event: workflow_started`
 
 Available workflow statuses:
 
