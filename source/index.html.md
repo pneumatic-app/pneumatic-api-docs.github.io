@@ -266,10 +266,12 @@ attachment_info = requests.post(
     data=file_info,
 ).json()
 
+payload = '<file contents here>'
+
 r = requests.put(
     attachment_info['file_upload_url'],
-    data=open('file', 'rb'), 
-    headers=headers,
+    data=payload, 
+    headers={'Content-Type': content_type},
 )
 ```
 
