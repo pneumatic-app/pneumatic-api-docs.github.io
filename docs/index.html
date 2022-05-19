@@ -652,12 +652,23 @@ Minus before the value will sort in descending order.
     <span class="n">data</span><span class="o">=</span><span class="n">file_info</span><span class="p">,</span>
 <span class="p">).</span><span class="n">json</span><span class="p">()</span>
 
+<span class="n">payload</span> <span class="o">=</span> <span class="s">'&lt;file contents here&gt;'</span>
+
 <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">put</span><span class="p">(</span>
     <span class="n">attachment_info</span><span class="p">[</span><span class="s">'file_upload_url'</span><span class="p">],</span>
-    <span class="n">data</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s">'file'</span><span class="p">,</span> <span class="s">'rb'</span><span class="p">),</span> 
-    <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> 
+    <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s">'Content-Type'</span><span class="p">:</span> <span class="n">content_type</span><span class="p">},</span>
 <span class="p">)</span>
-</code></pre></div><h3 id='http-request-3'>HTTP Request</h3>
+</code></pre></div>
+<blockquote>
+<p>The above command returns JSON structured like this:</p>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="err">int</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"file_upload_url"</span><span class="p">:</span><span class="w"> </span><span class="err">str</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">URL</span><span class="w"> </span><span class="err">to</span><span class="w"> </span><span class="err">upload</span><span class="w"> </span><span class="err">file</span><span class="w">
+  </span><span class="nl">"thumbnail_upload_url"</span><span class="p">:</span><span class="w"> </span><span class="err">str?</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">URL</span><span class="w"> </span><span class="err">to</span><span class="w"> </span><span class="err">upload</span><span class="w"> </span><span class="err">thumbnail</span><span class="w"> 
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h3 id='http-request-3'>HTTP Request</h3>
 <p><code>POST https://api.pneumatic.app/workflows/attachments</code></p>
 <h3 id='body-parameters'>Body Parameters</h3>
 <table><thead>

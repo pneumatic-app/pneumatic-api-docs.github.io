@@ -275,6 +275,16 @@ r = requests.put(
 )
 ```
 
+> The above command returns JSON structured like this:
+
+```json
+{
+  "id": int,
+  "file_upload_url": str, // URL to upload file
+  "thumbnail_upload_url": str?, // URL to upload thumbnail 
+}
+```
+
 ### HTTP Request
 
 `POST https://api.pneumatic.app/workflows/attachments`
