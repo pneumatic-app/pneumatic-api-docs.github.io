@@ -793,7 +793,7 @@ event | Available values: task_completed (Deprecated), process_started (Deprecat
 All parameters are mandatory.
 </aside>
 
-## Unsubscribe by Webhook ID
+## Unsubscribe from a webhook by ID
 
 ```python
 import requests
