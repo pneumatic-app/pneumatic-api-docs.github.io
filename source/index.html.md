@@ -50,7 +50,7 @@ r = requests.get('https://api.pneumatic.app/templates', headers=headers)
     "description": "Description of this template",
     "performers_count": 3,
     "tasks_count": 6,
-    "run_allowed": [
+    "template_owners": [
        {
           "id": 2,
           "email": "john.doe@example.com",
@@ -155,7 +155,7 @@ r = requests.get(f'https://api.pneumatic.app/templates/{template_id}', headers=h
   "finalizable": bool, // This workflow can be finished at any stage.
   "date_updated": str, // format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
   "updated_by": int, // User who made the last update
-  "run_allowed": [int], // Template owners. Users who can either run or edit it.
+  "template_owners": [int], // Template owners. Users who can either run or edit it.
   "tasks_count": int,
   "performers_count": int,
   "kickoff": {
