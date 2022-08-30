@@ -799,7 +799,7 @@ This endpoint deletes an existing webhook subscription.
 
 ### HTTP Request
 
-`DELETE https://api.pneumatic.app/webhooks/unsubscribe`
+`POST https://api.pneumatic.app/webhooks/unsubscribe`
 
 
 
