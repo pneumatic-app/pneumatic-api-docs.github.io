@@ -695,7 +695,7 @@ InvitedFromEnum:
 
 # Webhooks
 
-## Get All Webhooks
+## Get the Subscription URL
 
 ```python
 import requests
@@ -704,44 +704,30 @@ api_key = 'your_api_key'
 headers = {
   'Authorization': f'Bearer {api_key}'
 }
-
-r = requests.get('https://api.pneumatic.app/webhooks', headers=headers)
+end_point = 'https://api.pneumatic.app/webhooks/subscription'
+r = requests.get(end_point, headers=headers)
 ```
 
-> The above command returns JSON structured like this:
+> The above command returns a JSON containing your subscription url or null:
 
 ```json
-[
-  {
-    "id": 1,
-    "created": "datetime",
-    "updated": "datetime",
-    "event": "task_completed_v2",
-    "target": "https://webhook.com/listener-url"
-  },
-  {
-    "id": 2,
-    "created": "datetime",
-    "updated": "datetime",
-    "event": "workflow_started",
-    "target": "https://webhook.com/listener-url-2"
-  },
-  ...
-]
+{
+   "url": str | null
+}
 ```
 
-This endpoint retrieves all active webhooks in your account.
+This endpoint returns the subscription url for all the webhooks in the system
 
 ### HTTP Request
 
-`GET https://api.pneumatic.app/webhooks`
+`GET https://api.pneumatic.app/webhooks/subscription`
 
-Available events:
+You subscribe to all available events at the same time:
 
-- task_completed_v2
-- task_returned
-- workflow_started
-- workflow_completed
+- workflow started
+- workflow completed
+- task completed
+- task returned
 
 ## Subscribe
 
@@ -752,49 +738,43 @@ api_key = 'your_api_key'
 headers = {
   'Authorization': f'Bearer {api_key}'
 }
+end_point = 'https://api.pneumatic.app/webhooks/subscribe'
 payload = {
-  'target': 'your_webhook_listener_url',
-  'event': 'event_name'
+  'url': 'your_subscription_url',
 }
 
 r = requests.post(
-  'https://api.pneumatic.app/webhooks', 
+  end_point, 
   headers=headers,
   data=payload
 )
 ```
 
-> The above command returns JSON structured like this:
+> If successful the above command returns an empty json
 
 ```json
-{
-  "id": 1,
-  "created": "datetime",
-  "updated": "datetime",
-  "event": "event_name",
-  "target": "your_webhook_listener_url"
-}
+{}
 ```
 
-This endpoint creates a new webhook subscription.
+The endpoint subscribes the supplied url to all events.
+Any already existing subscription url will be replaced
 
 ### HTTP Request
 
-`POST https://api.pneumatic.app/webhooks`
+`POST https://api.pneumatic.app/webhooks/subscribe`
 
 ### Body Parameters
 
 Parameter | Description
 --------- | -----------
-target | URL to create a new webhook subscription
-event | Available values: task_completed (Deprecated), process_started (Deprecated), process_completed (Deprecated), task_completed_v2, task_returned, workflow_started, workflow_completed
+url | the url that you want Pneumatic event notifications to be sent to
+
 
 <aside class="notice">
-All parameters are mandatory.
+The commmand subscribes the url to all events. Any existing subscription gets replaced by the new url.
 </aside>
 
-## Unsubscribe from a webhook by ID
-
+## Unsubscribe 
 ```python
 import requests
 
@@ -802,13 +782,12 @@ api_key = 'your_api_key'
 headers = {
   'Authorization': f'Bearer {api_key}'
 }
+end_point = 'https://api.pneumatic.app/webhooks/unsubscribe'
 
-r = requests.delete(
-  'https://api.pneumatic.app/webhooks/:id', headers=headers
-)
+r = requests.post(end_point)
 ```
 
-> The above command returns JSON structured like this:
+> The above command returns 204 if successful:
 
 ```json
 {
@@ -820,47 +799,9 @@ This endpoint deletes an existing webhook subscription.
 
 ### HTTP Request
 
-`DELETE https://api.pneumatic.app/webhooks/:id`
+`DELETE https://api.pneumatic.app/webhooks/unsubscribe`
 
-## Unsubscribe by Target URL
 
-```python
-import requests
-
-api_key = 'your_api_key'
-headers = {
-  'Authorization': f'Bearer {api_key}'
-}
-payload = {
-  'target': 'your_webhook_listener_url',
-}
-
-r = requests.delete(
-  'https://api.pneumatic.app/webhooks/target', 
-  headers=headers,
-  data=payload
-)
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "ok": true
-}
-```
-
-This endpoint deletes an existing webhook subscription.
-
-### HTTP Request
-
-`DELETE https://api.pneumatic.app/webhooks/target`
-
-### Body Parameters
-
-Parameter | Description
---------- | -----------
-target | URL to be removed from webhook listeners.
 
 ## Task Completed Webhook Event Schema
 <a id="task-completed-webhook"></a>
