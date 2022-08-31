@@ -311,7 +311,7 @@ headers = {
 attachment_id = 123
 
 r = requests.post(
-    f'https://api.pneumatic.app/workflows/attachments/{attachment_id}/links', 
+    f'https://api.pneumatic.app/workflows/attachments/{attachment_id}/publicate', 
     headers=headers,
 )
 ```
