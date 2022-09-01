@@ -767,7 +767,7 @@ Any already existing subscription url will be replaced
 
 Parameter | Description
 --------- | -----------
-url | the url that you want Pneumatic event notifications to be sent to
+url | the url that you want Pneumatic to send event notifications to
 
 
 <aside class="notice">
