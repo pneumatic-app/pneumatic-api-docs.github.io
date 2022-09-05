@@ -695,7 +695,7 @@ InvitedFromEnum:
 
 # Webhooks
 
-## Get the Subscription URL
+## Events
 
 ```python
 import requests
@@ -704,11 +704,73 @@ api_key = 'your_api_key'
 headers = {
   'Authorization': f'Bearer {api_key}'
 }
-end_point = 'https://api.pneumatic.app/webhooks/subscription'
+end_point = 'https://api.pneumatic.app/webhooks/events'
 r = requests.get(end_point, headers=headers)
 ```
 
-> The above command returns a JSON containing your subscription url or null:
+> The command returns a list of events with the current state of the subscription for each one of them:
+
+```json
+[
+  {
+     "event": 'workflow_completed',
+     "url": str | null
+  },
+  {
+     "event": 'workflow_started',
+     "url": str | null
+  },
+    {
+     "event": 'task_completed_v2',
+     "url": str | null
+  },
+  {
+     "event": 'task_returned',
+     "url": str | null
+  }
+]
+```
+
+The endpoint returns a list of events with their subscriptions
+
+### HTTP Request
+
+`GET https://api.pneumatic.app/webhooks/events`
+
+For each event in the returned list you get:
+
+- the name of the event
+- the subscription url or null
+
+Pneumatic has four basic events you can subscribe to via webhooks:
+
+- workflow started
+- workflow completed
+- task completed
+- task returned
+
+
+## Get a Specific Event
+
+```python
+import requests
+
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}'
+}
+end_point = 'https://api.pneumatic.app/webhooks/events/event_name'
+payload = {
+  'url': 'your_subscription_url',
+}
+
+r = requests.get(
+  end_point, 
+  headers=headers,
+)
+```
+
+> If successful the above command returns a jason with the url subscribed to the event or null
 
 ```json
 {
@@ -716,21 +778,108 @@ r = requests.get(end_point, headers=headers)
 }
 ```
 
-This endpoint returns the subscription url for all the webhooks in the system
+The endpoint returns the url subscribed to a specific event or nill
+
 
 ### HTTP Request
 
-`GET https://api.pneumatic.app/webhooks/subscription`
+`POST https://api.pneumatic.app/webhooks/events/event_name`
 
-You subscribe to all available events at the same time:
+### Available event names
 
-- workflow started
-- workflow completed
-- task completed
-- task returned
+Event name | Description
+--------- | -----------
+workflow_completed | an entire workflow is completed
+workflow_started | a new workflow is started
+task_completed_v2 | a task is completed
+task_returned| a task is returned
 
-## Subscribe
+<aside class="notice">
+The events are template-agnostic, i.e. you will get notified about completed/returned tasks and completed/started workflows regadless of the template 
+</aside>
 
+## Subscribe to an event
+```python
+import requests
+
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}'
+}
+end_point = 'https://api.pneumatic.app/webhooks/events/event_name/subscribe'
+payload = {
+  'url': subscription_url
+}
+
+r = requests.post(end_point, headers=headers, data = payload)
+```
+
+> if successful, the commande will subscribe subscription_url to event_name:
+> If executed successfully, the request returns an ampty body
+
+```json
+{}
+```
+
+This endpoint subscribes you to the event_name event.
+
+### HTTP Request
+
+`POST https://api.pneumatic.app/webhooks/events/event_name/subscribe`
+
+### Available event names
+
+Event name | Description
+--------- | -----------
+workflow_completed | an entire workflow is completed
+workflow_started | a new workflow is started
+task_completed_v2 | a task is completed
+task_returned| a task is returned
+
+
+<aside class="notice">
+Note: any existing subscription will be overwritten
+</aside>
+
+## Unsubscribe from an event 
+```python
+import requests
+
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}'
+}
+end_point = 'https://api.pneumatic.app/webhooks/events/event_name/unsubscribe'
+
+r = requests.post(end_point, headers=headers)
+```
+
+> if successful, the command will ubsubscibe you from the event_name event:
+> If successfuly command returns 204 and an empty body
+
+```json
+{}
+
+```
+
+This endpoint unsubscribes you from the event_name event.
+
+### HTTP Request
+
+`POST https://api.pneumatic.app/webhooks/events/event_name/unsubscribe`
+
+### Available event names
+
+Event name | Description
+--------- | -----------
+workflow_completed | an entire workflow is completed
+workflow_started | a new workflow is started
+task_completed_v2 | a task is completed
+task_returned| a task is returned
+
+There is no need to supply a specific url, the webhook url for the specified event will simply be deleted.
+
+## Subscribe to all events at once
 ```python
 import requests
 
@@ -739,42 +888,26 @@ headers = {
   'Authorization': f'Bearer {api_key}'
 }
 end_point = 'https://api.pneumatic.app/webhooks/subscribe'
-payload = {
-  'url': 'your_subscription_url',
-}
 
-r = requests.post(
-  end_point, 
-  headers=headers,
-  data=payload
-)
+r = requests.post(end_point, headers=headers)
 ```
 
-> If successful the above command returns an empty json
+> if successful, the command will subscribe you to all events at once:
+> The command returns the subscription url that will be set for all events:
 
 ```json
-{}
+{
+  'url': str
+}
 ```
 
-The endpoint subscribes the supplied url to all events.
-Any already existing subscription url will be replaced
+This endpoint subscribes you to all events at once.
 
 ### HTTP Request
 
 `POST https://api.pneumatic.app/webhooks/subscribe`
 
-### Body Parameters
-
-Parameter | Description
---------- | -----------
-url | the url that you want Pneumatic to send event notifications to
-
-
-<aside class="notice">
-The commmand subscribes the url to all events. Any existing subscription gets replaced by the new url.
-</aside>
-
-## Unsubscribe 
+## Unsubscribe from all events at once
 ```python
 import requests
 
@@ -784,18 +917,18 @@ headers = {
 }
 end_point = 'https://api.pneumatic.app/webhooks/unsubscribe'
 
-r = requests.post(end_point)
+r = requests.post(end_point, headers=headers)
 ```
 
-> The above command returns 204 if successful:
+> if successful, the command will cancel all your subscriptions at once.
+> All the urls for all the events will have been wiped.
+> The command returns an empty body
 
 ```json
-{
-  "ok": true
-}
+{}
 ```
 
-This endpoint deletes an existing webhook subscription.
+This endpoint cancels all your webhook subscriptions at once.
 
 ### HTTP Request
 
