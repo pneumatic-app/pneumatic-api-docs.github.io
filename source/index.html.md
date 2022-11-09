@@ -496,7 +496,7 @@ offset | no | Number of page. Default value is 0
 
 # Tasks
 
-## Get a task list
+## Get a list of tasks
 <a id="get-task-list"></a>
 
 ```python
@@ -534,7 +534,7 @@ r = requests.get(
 }
 ```
 
-This endpoint returns running tasks assigned to specified user.
+This endpoint returns running tasks assigned to a specified user.
 
 ### HTTP Request
 
@@ -548,7 +548,7 @@ assigned_to | no | User id assigned to tasks
 limit | no | Size of page
 offset | no | Number of page
 
-## Get  task
+## Get a single task
 <a id="get-specific-task"></a>
 
 ```python
@@ -615,11 +615,70 @@ r = requests.get(
 }
 ```
 
-This endpoint returns a specified task.
+This endpoint returns a specific task.
 
 ### HTTP Request
 
 `GET https://api.pneumatic.app/v2/tasks/<id>`
+
+## Complete a task
+<a id="complete-task"></a>
+
+```python
+import requests
+
+api_key = 'your_api_key'
+headers = {
+  'Authorization': f'Bearer {api_key}',
+}
+
+workflow_id ='the id of the workflow you want to complete the curren task in'
+workflow = requests.get(f"https://api.pneumatic.app/workflows/{workflow_id}", headers=headers).json()
+
+task_id =workflow['current_task']['id'] 
+user_id='the id of the user who will be completing the task(optiona)'
+
+headers = {
+  'Authorization': f'Bearer {api_key}',
+  'Content-Type':'application/json'
+}
+
+data_and_outputs ={
+  'task_id':task_id,
+  'user_id':user_id,
+  'output': {
+    'output-field-1':'value',
+    'output-field-2:['selection-id-1', 'selection-id-2' ...],
+    'output-field-3: 'selection-id',
+  }
+}
+json_data = json.dumps(data_and_outputs)
+r = requests.post(
+  f'https://api.pneumatic.app/workflows/{workflow_id}/task-complete',
+  headers=headers,
+  data = json_data
+)
+```
+>if successful the above request returns a success code
+>otherwise a json describing the nature of the error will be returned
+
+The endpoint completes the current task in a workflow
+
+### HTTP Request
+
+`POST https://api.pneumatic.app/<workflow-id>/task-complete`
+
+Only the currently active task in a workflow can be completed.
+To do so you need to pass in the task-id along with data for the output fields you want filled out before the task is completed.
+
+These are passed in as a json of the form shown in the code example on the right where it is assigned to the data_and_outputs variable.
+
+Thus, to complete a task, you need to know:
+
+* the id of the workflow the task belongs to – you can look this up in Pneumatic
+* the id of the task to complete – you can query the workflow for the id of the current task
+* the API names of the output fields you want to fill out, along with the selection ids of the checkbox and radio button fields you'll be filling out – you can look these up on the API tab in the integrations section of your template
+
 
 # Users
 

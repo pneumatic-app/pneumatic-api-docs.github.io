@@ -336,10 +336,13 @@
             <a href="#tasks" class="toc-h1 toc-link" data-title="Tasks">Tasks</a>
               <ul class="toc-list-h2">
                   <li>
-                    <a href="#get-a-task-list" class="toc-h2 toc-link" data-title="Get a task list">Get a task list</a>
+                    <a href="#get-a-list-of-tasks" class="toc-h2 toc-link" data-title="Get a list of tasks">Get a list of tasks</a>
                   </li>
                   <li>
-                    <a href="#get-task" class="toc-h2 toc-link" data-title="Get  task">Get  task</a>
+                    <a href="#get-a-single-task" class="toc-h2 toc-link" data-title="Get a single task">Get a single task</a>
+                  </li>
+                  <li>
+                    <a href="#complete-a-task" class="toc-h2 toc-link" data-title="Complete a task">Complete a task</a>
                   </li>
               </ul>
           </li>
@@ -927,7 +930,7 @@ Minus before the value will sort in descending order.
 <td>Number of page. Default value is 0</td>
 </tr>
 </tbody></table>
-<h1 id='tasks'>Tasks</h1><h2 id='get-a-task-list'>Get a task list</h2>
+<h1 id='tasks'>Tasks</h1><h2 id='get-a-list-of-tasks'>Get a list of tasks</h2>
 <p><a id="get-task-list"></a></p>
 <div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
 
@@ -961,7 +964,7 @@ Minus before the value will sort in descending order.
   </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div>
-<p>This endpoint returns running tasks assigned to specified user.</p>
+<p>This endpoint returns running tasks assigned to a specified user.</p>
 <h3 id='http-request-7'>HTTP Request</h3>
 <p><code>GET https://api.pneumatic.app/v3/tasks</code></p>
 <h3 id='url-parameters-5'>URL Parameters</h3>
@@ -988,7 +991,7 @@ Minus before the value will sort in descending order.
 <td>Number of page</td>
 </tr>
 </tbody></table>
-<h2 id='get-task'>Get  task</h2>
+<h2 id='get-a-single-task'>Get a single task</h2>
 <p><a id="get-specific-task"></a></p>
 <div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
 
@@ -1051,9 +1054,66 @@ Minus before the value will sort in descending order.
    </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div>
-<p>This endpoint returns a specified task.</p>
+<p>This endpoint returns a specific task.</p>
 <h3 id='http-request-8'>HTTP Request</h3>
 <p><code>GET https://api.pneumatic.app/v2/tasks/&lt;id&gt;</code></p>
+<h2 id='complete-a-task'>Complete a task</h2>
+<p><a id="complete-task"></a></p>
+<div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">api_key</span> <span class="o">=</span> <span class="s">'your_api_key'</span>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s">'Authorization'</span><span class="p">:</span> <span class="sa">f</span><span class="s">'Bearer </span><span class="si">{</span><span class="n">api_key</span><span class="si">}</span><span class="s">'</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">workflow_id</span> <span class="o">=</span><span class="s">'the id of the workflow you want to complete the curren task in'</span>
+<span class="n">workflow</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s">"https://api.pneumatic.app/workflows/</span><span class="si">{</span><span class="n">workflow_id</span><span class="si">}</span><span class="s">"</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">).</span><span class="n">json</span><span class="p">()</span>
+
+<span class="n">task_id</span> <span class="o">=</span><span class="n">workflow</span><span class="p">[</span><span class="s">'current_task'</span><span class="p">][</span><span class="s">'id'</span><span class="p">]</span> 
+<span class="n">user_id</span><span class="o">=</span><span class="s">'the id of the user who will be completing the task(optiona)'</span>
+
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s">'Authorization'</span><span class="p">:</span> <span class="sa">f</span><span class="s">'Bearer </span><span class="si">{</span><span class="n">api_key</span><span class="si">}</span><span class="s">'</span><span class="p">,</span>
+  <span class="s">'Content-Type'</span><span class="p">:</span><span class="s">'application/json'</span>
+<span class="p">}</span>
+
+<span class="n">data_and_outputs</span> <span class="o">=</span><span class="p">{</span>
+  <span class="s">'task_id'</span><span class="p">:</span><span class="n">task_id</span><span class="p">,</span>
+  <span class="s">'user_id'</span><span class="p">:</span><span class="n">user_id</span><span class="p">,</span>
+  <span class="s">'output'</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s">'output-field-1'</span><span class="p">:</span><span class="s">'value'</span><span class="p">,</span>
+    <span class="s">'output-field-2:['</span><span class="n">selection</span><span class="o">-</span><span class="nb">id</span><span class="o">-</span><span class="mi">1</span><span class="s">', '</span><span class="n">selection</span><span class="o">-</span><span class="nb">id</span><span class="o">-</span><span class="mi">2</span><span class="s">' ...],
+    '</span><span class="n">output</span><span class="o">-</span><span class="n">field</span><span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="s">'selection-id'</span><span class="p">,</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data_and_outputs</span><span class="p">)</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span>
+  <span class="sa">f</span><span class="s">'https://api.pneumatic.app/workflows/</span><span class="si">{</span><span class="n">workflow_id</span><span class="si">}</span><span class="s">/task-complete'</span><span class="p">,</span>
+  <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+  <span class="n">data</span> <span class="o">=</span> <span class="n">json_data</span>
+<span class="p">)</span>
+</code></pre></div>
+<blockquote>
+<p>if successful the above request returns a success code
+otherwise a json describing the nature of the error will be returned</p>
+</blockquote>
+
+<p>The endpoint completes the current task in a workflow</p>
+<h3 id='http-request-9'>HTTP Request</h3>
+<p><code>POST https://api.pneumatic.app/&lt;workflow-id&gt;/task-complete</code></p>
+
+<p>Only the currently active task in a workflow can be completed.
+To do so you need to pass in the task-id along with data for the output fields you want filled out before the task is completed.</p>
+
+<p>These are passed in as a json of the form shown in the code example on the right where it is assigned to the data_and_outputs variable.</p>
+
+<p>Thus, to complete a task, you need to know:</p>
+
+<ul>
+<li>the id of the workflow the task belongs to – you can look this up in Pneumatic</li>
+<li>the id of the task to complete – you can query the workflow for the id of the current task</li>
+<li>the API names of the output fields you want to fill out, along with the selection ids of the checkbox and radio button fields you&#39;ll be filling out – you can look these up on the API tab in the integrations section of your template</li>
+</ul>
 <h1 id='users'>Users</h1><h2 id='get-user-list'>Get user list</h2><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
 
 <span class="n">api_key</span> <span class="o">=</span> <span class="s">'your_api_key'</span>
@@ -1095,7 +1155,7 @@ Minus before the value will sort in descending order.
     </span><span class="p">}</span><span class="w">
   </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre></div><h3 id='http-request-9'>HTTP Request</h3>
+</span></code></pre></div><h3 id='http-request-10'>HTTP Request</h3>
 <p><code>GET https://api.pneumatic.app/accounts/users</code></p>
 <h3 id='url-parameters-6'>URL Parameters</h3>
 <table><thead>
@@ -1164,7 +1224,7 @@ Minus before the value will sort in descending order.
 </span><span class="p">]</span><span class="w">
 </span></code></pre></div>
 <p>The endpoint returns a list of events with their subscriptions</p>
-<h3 id='http-request-10'>HTTP Request</h3>
+<h3 id='http-request-11'>HTTP Request</h3>
 <p><code>GET https://api.pneumatic.app/webhooks/events</code></p>
 
 <p>For each event in the returned list you get:</p>
@@ -1206,7 +1266,7 @@ Minus before the value will sort in descending order.
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div>
 <p>The endpoint returns the url subscribed to a specific event or nill</p>
-<h3 id='http-request-11'>HTTP Request</h3>
+<h3 id='http-request-12'>HTTP Request</h3>
 <p><code>POST https://api.pneumatic.app/webhooks/events/event_name</code></p>
 <h3 id='available-event-names'>Available event names</h3>
 <table><thead>
@@ -1256,7 +1316,7 @@ If executed successfully, the request returns an ampty body</p>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{}</span><span class="w">
 </span></code></pre></div>
 <p>This endpoint subscribes you to the event_name event.</p>
-<h3 id='http-request-12'>HTTP Request</h3>
+<h3 id='http-request-13'>HTTP Request</h3>
 <p><code>POST https://api.pneumatic.app/webhooks/events/event_name/subscribe</code></p>
 <h3 id='available-event-names-2'>Available event names</h3>
 <table><thead>
@@ -1304,7 +1364,7 @@ If successfuly command returns 204 and an empty body</p>
 
 </span></code></pre></div>
 <p>This endpoint unsubscribes you from the event_name event.</p>
-<h3 id='http-request-13'>HTTP Request</h3>
+<h3 id='http-request-14'>HTTP Request</h3>
 <p><code>POST https://api.pneumatic.app/webhooks/events/event_name/unsubscribe</code></p>
 <h3 id='available-event-names-3'>Available event names</h3>
 <table><thead>
@@ -1351,7 +1411,7 @@ The command returns the subscription url that will be set for all events:</p>
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div>
 <p>This endpoint subscribes you to all events at once.</p>
-<h3 id='http-request-14'>HTTP Request</h3>
+<h3 id='http-request-15'>HTTP Request</h3>
 <p><code>POST https://api.pneumatic.app/webhooks/subscribe</code></p>
 <h2 id='unsubscribe-from-all-events-at-once'>Unsubscribe from all events at once</h2><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
 
@@ -1371,7 +1431,7 @@ The command returns an empty body</p>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{}</span><span class="w">
 </span></code></pre></div>
 <p>This endpoint cancels all your webhook subscriptions at once.</p>
-<h3 id='http-request-15'>HTTP Request</h3>
+<h3 id='http-request-16'>HTTP Request</h3>
 <p><code>POST https://api.pneumatic.app/webhooks/unsubscribe</code></p>
 <h2 id='task-completed-webhook-event-schema'>Task Completed Webhook Event Schema</h2>
 <p><a id="task-completed-webhook"></a></p>
