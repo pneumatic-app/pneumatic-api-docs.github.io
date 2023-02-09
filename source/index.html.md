@@ -241,6 +241,131 @@ FieldTypeEnum:
 - file
 - user
 
+## Create a new template
+<a id="create-template"></a>
+
+```python
+import json
+import requests
+
+api_key = 'your_api_key'
+
+headers = {
+  'Authorization': f'Bearer {api_key}',
+  'Content-Type': 'application/json'
+}
+
+template_info = {
+  "name": "template name",
+  "description": "template descrition optiona",   
+  "template_owners": "[int]",
+  "is_active": "bool optional, default false",    
+  "is_public": "bool optional, default false",    
+  "public_url": "str | null",
+  "public_success_url": "string optional, defualt null",
+  "is_embedded": "bool optional default false",     
+  "embed_url": "str | null",
+  "finalizable":"bool optional, default false",
+  "kickoff": { 
+    "description": "string optional",
+    "fields": [
+      {
+        "api_name": "string optional", 
+        "order": "int", 
+        "name": "int", 
+        "type": "int", 
+        "is_required": "bool optional default false",
+        "description": "string optional", 
+        "default:": "string optional"
+        "selections": [      #only passed in if there are radio button/checkbox fields 
+          { 
+            "value": "string"
+          }
+        ]  
+      }
+    ] 
+  },
+  "tasks": [
+    {
+      "number": "int"",
+      "name": "string",
+      "description": "string optional",
+      "delay": "string optional: [DD] [[hh:]mm:]ss",
+      "due_in": "string optional: '[DD] [[hh:]mm:]ss'",
+      "require_completion_by_all": "bool optional default false",
+      "raw_performers": [
+        {
+          "type": "user"|"field"|"workflow_starter"|"group", 
+          "source_id": "string optional, user/user group id, api_name of the field"
+        },
+      ],
+      "checklists": [
+        {
+          "api_name": "string optional",
+          "selecions": [
+            {
+              "api_name": "string optional",
+              "value": "string"
+            }
+          ]
+        }
+      ],
+      "fields": [#fields are optional
+    	{ 
+    	  "api_name": "string optional",
+    	  "order": "int", 
+          "name": "string", 
+          "type": "string, 
+          "is_required": "bool optional, default - false",
+          "description": "string optiona", 
+          "default": "string optional",
+          "selections": [     #only passed in for radio buttons, checkboxes and dropdown lists
+            { 
+              "value": "string"
+            }
+          ] 
+    	}
+      ],
+      "conditions": [#an optional parameter
+        {
+          "action": "string end_process, skip_task, start_task",
+          "order": "int",
+          "api_name": "string",
+          "rules": [
+            {
+              "api_name": "string",
+              "predicates": [
+                {
+                  "field_type": "string",
+                  "value": "string optional",
+                  "api_name": "string optional",
+                  "field": "string - api name",
+                  "operator": "string equals, not_equals, exists, not_exists, contains, not_contains, more_than, less_than"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+json_data = json.dumps(template_info)
+r = requests.post(
+    f'https://api.pneumatic.app/templates', 
+    headers=headers,
+    data=json_data,
+)
+
+```
+The endpoint creates a new template as per the parametrs passed in the json.
+
+### HTTP Request
+
+`POST https://api.pneumatic.app/templates`
+
+
 ## Upload file for attachment
 
 ```python
