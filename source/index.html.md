@@ -944,9 +944,6 @@ headers = {
   'Authorization': f'Bearer {api_key}'
 }
 end_point = 'https://api.pneumatic.app/webhooks/events/event_name'
-payload = {
-  'url': 'your_subscription_url',
-}
 
 r = requests.get(
   end_point, 
@@ -967,7 +964,7 @@ The endpoint returns the url subscribed to a specific event or nill
 
 ### HTTP Request
 
-`POST https://api.pneumatic.app/webhooks/events/event_name`
+`GET https://api.pneumatic.app/webhooks/events/event_name`
 
 ### Available event names
 
