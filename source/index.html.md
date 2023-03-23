@@ -42,63 +42,45 @@ r = requests.get('https://api.pneumatic.app/templates', headers=headers)
 > The above command returns JSON structured like this:
 
 ```json
-[
-  {
-    "id": 1,
-    "name": "Template name",
-    "is_active": true,
-    "description": "Description of this template",
-    "performers_count": 3,
-    "tasks_count": 6,
-    "template_owners": [
-       {
-          "id": 2,
-          "email": "john.doe@example.com",
-          "first_name": "John",
-          "last_name": "Doe",
-          "photo": "https://example.com/avatar.jpeg",
-          "status": "active",
-          "invite": { // nullable
-             "id": "some UUID",
-             "invited_by": 1,
-             "date_created": "2020-04-15T06:50:12.682106Z",
-             "invited_from": "email", // slack, google
-             "by_username": "Pneumatic Owner"
-          }
-       }
-    ],
-    "kickoff": {
-       "id": 1,
-       "description": "Kick-off form description",
-       "fields": [
-          {
-            "name": "Field name",
-            "description": "Field description",
-            "type": "string",
-            "is_required": false, 
-            "api_name": "field-name-1",
-            "selections": [],
-            "order": 1
-          },
-          {
-            "name": "Checkbox Field",
-            "description": "Field description",
-            "type": "checkbox",
-            "is_required": false, 
-            "api_name": "checkbox-field-2",
+{
+  "count": 10,
+  "next": "str",
+  "previous": "str",
+  "results": [
+    {
+      "id": 1,
+      "name": "Sample Template",
+      "tasks_count": "int",
+      "performers_count": "str",
+      "template_owners": ["int"],
+      "is_active": "bool",
+      "is_public": "bool",
+      "is_embedded": "bool",
+      "description": "str",
+      "kickoff": {
+        "id": "int",
+        "description": "str",
+        "fields": [
+          { 
+            "name": "str", 
+            "type": "str", 
+            "order": "int",
+            "is_required": "bool", 
+            "description": "str", 
+            "api_name": "str",
             "selections": [
-              {"id": 1, "value": "checkbox value 1"},
-              {"id": 2, "value": "checkbox value 2"},
-              {"id": 3, "value": "checkbox value 3"}
-            ],
-            "order": 0
+              {
+                'id': "int",
+                'value': "str"
+              }
+            ]
           }
-       ]
-    },
-    "first_task_responsible": [1]
-  },
-  ...
-]
+        ]
+      }
+    }
+  ]
+
+}
 ```
 
 > If request contains limit/offset parameters then response will have structure like this:
@@ -148,66 +130,116 @@ r = requests.get(f'https://api.pneumatic.app/templates/{template_id}', headers=h
 
 ```json
 {
-  "id": int,
-  "name": str,
-  "description": str,
-  "is_active": bool,
-  "finalizable": bool, // This workflow can be finished at any stage.
-  "date_updated": str, // format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
-  "updated_by": int, // User who made the last update
-  "template_owners": [int], // Template owners. Users who can either run or edit it.
-  "tasks_count": int,
-  "performers_count": int,
+  "id": "int",
+  "name": "str",
+  "description": "str",
+  "is_active": "bool",
+  "is_public": "bool",
+  "public_url": "str | null",
+  "public_url": "str | null",
+  "public_success_url": "str | null",
+  "is_embedded": "?bool,     // default: false"
+  "embed_url": "str | null",
+  "finalizable": "bool",
+  "date_updated": "str", //" ISO 8601 format: YYYY-MM-DDThh:mm:ss[.SSS]" 
+  "updated_by": "int",
+  "template_owners": ["int"],
+  "tasks_count": "int",
+  "performers_count": "int",
   "kickoff": {
-    "id": int, 
-    "description": str, 
+    "id": "int", 
+    "description": "str", 
     "fields": [
-      {
-        "id": int,
-        "order": int,
-        "name": str,
-        "type": FieldTypeEnum,
-        "is_required": bool,
-        "description": str,
-        "api_name": str,
-        "selections": [ // Only for radio, checkbox, dropdown
-          {
-            "id": int,
-            "value": str
+      { 
+        "id": "int",
+        "order": "int",
+        "name": "str", 
+        "type": "str", 
+        "is_required": "bool", 
+        "description": "str", 
+        "default": "str",
+        "api_name": "str",
+        "selections": [ // these are only passed in for radio button checkbox and dropdown fields 
+          { 
+            "id": "int",
+            "value": "str"
           }
-        ]
+        ] 
       }
-    ]
+    ] 
   },
   "tasks": [
     {
-      "id": int,
-      "number": int,
-      "name": str,
-      "description": str,
-      "delay": str,       // null for not specified, format: '[DD] [[hh:]mm:]ss'
-      "require_completion_by_all": bool,
-      "is_starter_responsible": bool, // The workflow runner will be a performer for the task.
-      "responsible": [int], // Assigned performers.
-      "output_responsible": [ // The dynamic performers who will be assigned on the task from the previous tasks' and kickoff's output fields.
+      "id": "int", 
+      "number": "int",
+      "name": "str",
+      "description": "str",
+      "require_completion_by_all": "bool",
+      "delay": "str",       // null if the formal is not aset as: '[DD] [[hh:]mm:]ss'
+      "due_in": "str",      // DEPECATED
+      "raw_due_date": {   // see the legend below
+          "api_name": "str",
+          "duration": "str",
+          "rule": "str",
+          "source_id": "?str | null"
+      },
+      "raw_performers": [
         {
-          "api_name": str,
-          "name": str
+          "id": "int", 
+          "type": "user|field|workflow_starter", 
+          "source_id": "?str", // id the id of a user, group or the api name of the field or null 
+          "label": "str"       // this is a read only parameter: the user name, group name or field name  
+        },
+      ],
+      "checklists": ?[
+        {
+          "api_name": "str",
+          "selecions": [
+            {
+              "api_name": "str",
+              "value": "str"
+            }
+          ]
+        }
+      ]
+      "fields": ?[
+    	{ 
+          "id": "int",
+    	    "order": "int", 
+    	    "name": "str", 
+    	    "type": "str", 
+    	    "is_required": "bool", 
+    	    "description": "str",
+          "default": "str",
+    	    "api_name": "str",
+            "selections": [ // these are only passed in for radio button checkbox and dropdown fields 
+              { 
+                "id": "int",
+                "value": "str"
+              }
+            ]  
         }
       ],
-      "fields": [
-    	  {
-          "id": int,
-    	    "order": int,
-    	    "name": str,
-    	    "type": FieldTypeEnum,
-    	    "is_required": bool,
-    	    "description": str,
-          "api_name": str,
-          "selections": [ // Only for radio, checkbox, dropdown
+      "conditions": ?[
+        {
+          "id": "int",
+          "action": "str", // end_process, skip_task, start_task
+          "order": "int",
+          "api_name": "str",
+          "rules": [
             {
-              "id": int,
-              "value": str
+              "id": "int",
+              "api_name": "str",
+              "predicates": [
+                {
+                  "id": "int",
+                  "field_type": "str",
+                  "value": "Optional[str]",
+                  "api_name": "str",
+                  "field": "str", // the api_name of the field being used
+                  "operator": "str" // equals, not_equals, 	exists, not_exists, contains, not_contains, more_than, less_than
+                }
+              ]
             }
           ]
         }
@@ -229,17 +261,11 @@ Parameter | Description
 --------- | -----------
 ID | The ID of the template to retrieve
 
-FieldTypeEnum:
+Empty field values:
 
-- string
-- text
-- radio
-- checkbox
-- date
-- url
-- dropdown
-- file
-- user
+- null for strings and numbers
+- [] for lists
+- false for booleans
 
 ## Create a new template
 <a id="create-template"></a>
@@ -423,7 +449,7 @@ content_type  | Yes | Header is used to indicate the media type of the resource 
 size  | Yes | Size of file (less than 104857600 bytes)
 thumbnail | No  | Boolean. Set `true` if you'd like to upload thumbnail image
 
-## Make file public
+## Make a file public
 
 ```python
 import requests
@@ -436,7 +462,7 @@ headers = {
 attachment_id = 123
 
 r = requests.post(
-    f'https://api.pneumatic.app/workflows/attachments/{attachment_id}/publicate', 
+    f'https://api.pneumatic.app/workflows/attachments/{attachment_id}/post', 
     headers=headers,
 )
 ```
