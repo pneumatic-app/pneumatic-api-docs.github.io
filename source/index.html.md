@@ -177,12 +177,6 @@ r = requests.get(f'https://api.pneumatic.app/templates/{template_id}', headers=h
       "require_completion_by_all": "bool",
       "delay": "str",       // null if the formal is not aset as: '[DD] [[hh:]mm:]ss'
       "due_in": "str",      // DEPECATED
-      "raw_due_date": {   // see the legend below
-          "api_name": "str",
-          "duration": "str",
-          "rule": "str",
-          "source_id": "?str | null"
-      },
       "raw_performers": [
         {
           "id": "int", 
@@ -462,7 +456,7 @@ headers = {
 attachment_id = 123
 
 r = requests.post(
-    f'https://api.pneumatic.app/workflows/attachments/{attachment_id}/post', 
+    f'https://api.pneumatic.app/workflows/attachments/{attachment_id}/publish', 
     headers=headers,
 )
 ```
@@ -471,11 +465,8 @@ r = requests.post(
 
 ```json
 {
-  "id": 1,
-  "name": "file_name",
-  "url": "url",
-  "thumbnail_url": "thumb_url",
-  "size": 103613
+  "url": "str",
+  "thumbnail_url": "str",
 }
 ```
 
@@ -483,7 +474,7 @@ You have to make your file public. Otherwise, nobody can watch it.
 
 ### HTTP Request
 
-`POST https://api.pneumatic.app/workflows/attachments/<ID>/links`
+`POST https://api.pneumatic.app/workflows/attachments/<ID>/publish`
 
 ### URL Parameters
 

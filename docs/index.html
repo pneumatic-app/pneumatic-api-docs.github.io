@@ -573,12 +573,6 @@ Minus before the value will sort in descending order.
       </span><span class="nl">"require_completion_by_all"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bool"</span><span class="p">,</span><span class="w">
       </span><span class="nl">"delay"</span><span class="p">:</span><span class="w"> </span><span class="s2">"str"</span><span class="p">,</span><span class="w">       </span><span class="err">//</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="err">if</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">formal</span><span class="w"> </span><span class="err">is</span><span class="w"> </span><span class="err">not</span><span class="w"> </span><span class="err">aset</span><span class="w"> </span><span class="err">as:</span><span class="w"> </span><span class="err">'</span><span class="p">[</span><span class="err">DD</span><span class="p">]</span><span class="w"> </span><span class="p">[[</span><span class="err">hh:</span><span class="p">]</span><span class="err">mm:</span><span class="p">]</span><span class="err">ss'</span><span class="w">
       </span><span class="nl">"due_in"</span><span class="p">:</span><span class="w"> </span><span class="s2">"str"</span><span class="p">,</span><span class="w">      </span><span class="err">//</span><span class="w"> </span><span class="err">DEPECATED</span><span class="w">
-      </span><span class="nl">"raw_due_date"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">   </span><span class="err">//</span><span class="w"> </span><span class="err">see</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">legend</span><span class="w"> </span><span class="err">below</span><span class="w">
-          </span><span class="nl">"api_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"str"</span><span class="p">,</span><span class="w">
-          </span><span class="nl">"duration"</span><span class="p">:</span><span class="w"> </span><span class="s2">"str"</span><span class="p">,</span><span class="w">
-          </span><span class="nl">"rule"</span><span class="p">:</span><span class="w"> </span><span class="s2">"str"</span><span class="p">,</span><span class="w">
-          </span><span class="nl">"source_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?str | null"</span><span class="w">
-      </span><span class="p">},</span><span class="w">
       </span><span class="nl">"raw_performers"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="p">{</span><span class="w">
           </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"int"</span><span class="p">,</span><span class="w"> 
@@ -865,7 +859,7 @@ Minus before the value will sort in descending order.
 <span class="n">attachment_id</span> <span class="o">=</span> <span class="mi">123</span>
 
 <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s">'https://api.pneumatic.app/workflows/attachments/</span><span class="si">{</span><span class="n">attachment_id</span><span class="si">}</span><span class="s">/post'</span><span class="p">,</span> 
+    <span class="sa">f</span><span class="s">'https://api.pneumatic.app/workflows/attachments/</span><span class="si">{</span><span class="n">attachment_id</span><span class="si">}</span><span class="s">/publish'</span><span class="p">,</span> 
     <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -873,16 +867,13 @@ Minus before the value will sort in descending order.
 <p>The above command returns JSON structured like this:</p>
 </blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-  </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"file_name"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"url"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"thumbnail_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"thumb_url"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"size"</span><span class="p">:</span><span class="w"> </span><span class="mi">103613</span><span class="w">
+  </span><span class="nl">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"str"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"thumbnail_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"str"</span><span class="p">,</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div>
 <p>You have to make your file public. Otherwise, nobody can watch it.</p>
 <h3 id='http-request-5'>HTTP Request</h3>
-<p><code>POST https://api.pneumatic.app/workflows/attachments/&lt;ID&gt;/links</code></p>
+<p><code>POST https://api.pneumatic.app/workflows/attachments/&lt;ID&gt;/publish</code></p>
 <h3 id='url-parameters-2'>URL Parameters</h3>
 <table><thead>
 <tr>
