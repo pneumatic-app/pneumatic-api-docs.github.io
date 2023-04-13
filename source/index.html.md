@@ -174,9 +174,15 @@ r = requests.get(f'https://api.pneumatic.app/templates/{template_id}', headers=h
       "number": "int",
       "name": "str",
       "description": "str",
+       "delay": "str",       // null if the formal is not aset as: '[DD] [[hh:]mm:]ss'
       "require_completion_by_all": "bool",
-      "delay": "str",       // null if the formal is not aset as: '[DD] [[hh:]mm:]ss'
-      "due_in": "str",      // DEPECATED
+      "raw_due_date": {   
+          "api_name": "str",
+          "duration": "str",
+          "duration_months": "int, default 0",
+          "rule": "str",
+          "source_id": "?str | null"
+      },
       "raw_performers": [
         {
           "id": "int", 
@@ -307,16 +313,24 @@ template_info = {
   },
   "tasks": [
     {
-      "number": "int"",
+      "number": "int",
       "name": "string",
       "description": "string optional",
-      "delay": "string optional: [DD] [[hh:]mm:]ss",
-      "due_in": "string optional: '[DD] [[hh:]mm:]ss'",
-      "require_completion_by_all": "bool optional default false",
+      "require_completion_by_all": "bool",
+      "delay": "string or null: [DD] [[hh:]mm:]ss",
+      "raw_due_date": {   
+          "api_name": "str",
+          "duration": "str",
+          "duration_months": "int, default 0",
+          "rule": "str",
+          "source_id": "?str | null"
+      },
       "raw_performers": [
         {
-          "type": "user"|"field"|"workflow_starter"|"group", 
-          "source_id": "string optional, user/user group id, api_name of the field"
+          "id": "int", 
+          "type": "user|field|workflow_starter", 
+          "source_id": "?str - user or group id or the api_name or null" 
+          "label": "str -  user/group/field name, read only" 
         },
       ],
       "checklists": [
@@ -667,7 +681,7 @@ r = requests.get(
       "id": str,
       "name": str,
       "workflow_name": str,
-      "estimated_end_date": str?, // null if task doesn't have 'due_in'. Format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
+      "due_date": null|str?, // null if task doesn't have a due date. Format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
       "template_id": int,
       "template_task_id": int,
       "is_urgent": bool
@@ -716,7 +730,7 @@ r = requests.get(
    "description": str,
    "date_started": str,
    "date_completed": null | str,
-   "estimated_end_date": null | str,
+   "due_date": null | str,
    "is_completed": bool,
    "is_urgent": bool,
    "require_completion_by_all": bool,
