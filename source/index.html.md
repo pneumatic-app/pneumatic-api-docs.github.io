@@ -854,7 +854,7 @@ r = requests.get(
 )
 ```
 
-> The above command returns JSON structured like this:
+> The above command returns JSON structured as follows:
 
 ```json
 {
@@ -893,14 +893,19 @@ r = requests.get(
 
 Parameter | Description
 --------- | -----------
+ordering | the field to order by.
+type | filter by user type.
+status | user status.
+groups | filter by group.
 limit | Use for pagination.
 offset | Use for pagination.
-order | asc\desc
 
-UserStatusEnum:
+Odering specifies the field the results are ordered by, several values can be passed in separated by a comma. Use a '-' to invert the order.
+Possible fields users can be ordered by:
 
-- active
-- invited
+- last_name(default),
+- first_name, 
+- status
 
 InvitedFromEnum:
 
