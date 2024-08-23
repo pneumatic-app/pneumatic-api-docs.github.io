@@ -13,6 +13,7 @@ api_key = 'api_key'
 headers = { 'Authorization': f'Bearer {api_key}' }
 response = requests.get('https://api.pneumatic.app/some-endpoint', headers=headers)
 ```
+
 Pneumatic expects for the API key to be included in all API requests to the server in a header that looks like the following:
 
 `Authorization: Bearer api_key`
@@ -26,6 +27,7 @@ Use bearer token authentication for each API request.
 # Templates
 
 ## Get All Templates
+
 <a id="template-list"></a>
 
 ```python
@@ -39,7 +41,7 @@ headers = {
 r = requests.get('https://api.pneumatic.app/templates', headers=headers)
 ```
 
-> The above command returns JSON structured like this:
+> The above request returns JSON structured like this:
 
 ```json
 {
@@ -61,17 +63,17 @@ r = requests.get('https://api.pneumatic.app/templates', headers=headers)
         "id": "int",
         "description": "str",
         "fields": [
-          { 
-            "name": "str", 
-            "type": "str", 
+          {
+            "name": "str",
+            "type": "str",
             "order": "int",
-            "is_required": "bool", 
-            "description": "str", 
+            "is_required": "bool",
+            "description": "str",
             "api_name": "str",
             "selections": [
               {
-                'id': "int",
-                'value': "str"
+                "id": "int",
+                "value": "str"
               }
             ]
           }
@@ -79,7 +81,6 @@ r = requests.get('https://api.pneumatic.app/templates', headers=headers)
       }
     }
   ]
-
 }
 ```
 
@@ -93,6 +94,7 @@ r = requests.get('https://api.pneumatic.app/templates', headers=headers)
   "results": [...] // list of templates
 }
 ```
+
 This endpoint retrieves all templates in your account.
 
 ### HTTP Request
@@ -101,17 +103,18 @@ This endpoint retrieves all templates in your account.
 
 ### Query Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-ordering | -date | Available values: date, name, -date, -name.
-limit | 20  | Use for pagination
-offset | 0  | Use for pagination
+| Parameter | Default | Description                                 |
+| --------- | ------- | ------------------------------------------- |
+| ordering  | -date   | Available values: date, name, -date, -name. |
+| limit     | 20      | Use for pagination                          |
+| offset    | 0       | Use for pagination                          |
 
 <aside class="success">
 Minus before the value will sort in descending order.
 </aside>
 
 ## Get a Specific Template
+
 <a id="get-template"></a>
 
 ```python
@@ -126,7 +129,7 @@ template_id = 1
 r = requests.get(f'https://api.pneumatic.app/templates/{template_id}', headers=headers)
 ```
 
-> The above command returns JSON structured like this:
+> The above request returns JSON structured like this:
 
 ```json
 {
@@ -141,42 +144,42 @@ r = requests.get(f'https://api.pneumatic.app/templates/{template_id}', headers=h
   "is_embedded": "?bool,     // default: false"
   "embed_url": "str | null",
   "finalizable": "bool",
-  "date_updated": "str", //" ISO 8601 format: YYYY-MM-DDThh:mm:ss[.SSS]" 
+  "date_updated": "str", //" ISO 8601 format: YYYY-MM-DDThh:mm:ss[.SSS]"
   "updated_by": "int",
   "template_owners": ["int"],
   "tasks_count": "int",
   "performers_count": "int",
   "kickoff": {
-    "id": "int", 
-    "description": "str", 
+    "id": "int",
+    "description": "str",
     "fields": [
-      { 
+      {
         "id": "int",
         "order": "int",
-        "name": "str", 
-        "type": "str", 
-        "is_required": "bool", 
-        "description": "str", 
+        "name": "str",
+        "type": "str",
+        "is_required": "bool",
+        "description": "str",
         "default": "str",
         "api_name": "str",
-        "selections": [ // these are only passed in for radio button checkbox and dropdown fields 
-          { 
+        "selections": [ // these are only passed in for radio button checkbox and dropdown fields
+          {
             "id": "int",
             "value": "str"
           }
-        ] 
+        ]
       }
-    ] 
+    ]
   },
   "tasks": [
     {
-      "id": "int", 
+      "id": "int",
       "number": "int",
       "name": "str",
       "description": "str",
        "delay": "str",       // null if the formal is not aset as: '[DD] [[hh:]mm:]ss'
       "require_completion_by_all": "bool",
-      "raw_due_date": {   
+      "raw_due_date": {
           "api_name": "str",
           "duration": "str",
           "duration_months": "int, default 0",
@@ -185,10 +188,10 @@ r = requests.get(f'https://api.pneumatic.app/templates/{template_id}', headers=h
       },
       "raw_performers": [
         {
-          "id": "int", 
-          "type": "user|field|workflow_starter", 
-          "source_id": "?str", // id the id of a user, group or the api name of the field or null 
-          "label": "str"       // this is a read only parameter: the user name, group name or field name  
+          "id": "int",
+          "type": "user|field|workflow_starter",
+          "source_id": "?str", // id the id of a user, group or the api name of the field or null
+          "label": "str"       // this is a read only parameter: the user name, group name or field name
         },
       ],
       "checklists": ?[
@@ -203,21 +206,21 @@ r = requests.get(f'https://api.pneumatic.app/templates/{template_id}', headers=h
         }
       ]
       "fields": ?[
-    	{ 
+    	{
           "id": "int",
-    	    "order": "int", 
-    	    "name": "str", 
-    	    "type": "str", 
-    	    "is_required": "bool", 
+    	    "order": "int",
+    	    "name": "str",
+    	    "type": "str",
+    	    "is_required": "bool",
     	    "description": "str",
           "default": "str",
     	    "api_name": "str",
-            "selections": [ // these are only passed in for radio button checkbox and dropdown fields 
-              { 
+            "selections": [ // these are only passed in for radio button checkbox and dropdown fields
+              {
                 "id": "int",
                 "value": "str"
               }
-            ]  
+            ]
         }
       ],
       "conditions": ?[
@@ -257,9 +260,9 @@ This endpoint retrieves a specific template.
 
 ### URL Parameters
 
-Parameter | Description
---------- | -----------
-ID | The ID of the template to retrieve
+| Parameter | Description                        |
+| --------- | ---------------------------------- |
+| ID        | The ID of the template to retrieve |
 
 Empty field values:
 
@@ -268,6 +271,7 @@ Empty field values:
 - false for booleans
 
 ## Create a new template
+
 <a id="create-template"></a>
 
 ```python
@@ -283,33 +287,33 @@ headers = {
 
 template_info = {
   "name": "template name",
-  "description": "template descrition optiona",   
+  "description": "template descrition optiona",
   "template_owners": "[int]",
-  "is_active": "bool optional, default false",    
-  "is_public": "bool optional, default false",    
+  "is_active": "bool optional, default false",
+  "is_public": "bool optional, default false",
   "public_url": "str | null",
   "public_success_url": "string optional, defualt null",
-  "is_embedded": "bool optional default false",     
+  "is_embedded": "bool optional default false",
   "embed_url": "str | null",
   "finalizable":"bool optional, default false",
-  "kickoff": { 
+  "kickoff": {
     "description": "string optional",
     "fields": [
       {
-        "api_name": "string optional", 
-        "order": "int", 
-        "name": "int", 
-        "type": "int", 
+        "api_name": "string optional",
+        "order": "int",
+        "name": "int",
+        "type": "int",
         "is_required": "bool optional default false",
-        "description": "string optional", 
+        "description": "string optional",
         "default:": "string optional"
-        "selections": [      #only passed in if there are radio button/checkbox fields 
-          { 
+        "selections": [      #only passed in if there are radio button/checkbox fields
+          {
             "value": "string"
           }
-        ]  
+        ]
       }
-    ] 
+    ]
   },
   "tasks": [
     {
@@ -318,7 +322,7 @@ template_info = {
       "description": "string optional",
       "require_completion_by_all": "bool",
       "delay": "string or null: [DD] [[hh:]mm:]ss",
-      "raw_due_date": {   
+      "raw_due_date": {
           "api_name": "str",
           "duration": "str",
           "duration_months": "int, default 0",
@@ -327,10 +331,10 @@ template_info = {
       },
       "raw_performers": [
         {
-          "id": "int", 
-          "type": "user|field|workflow_starter", 
-          "source_id": "?str - user or group id or the api_name or null" 
-          "label": "str -  user/group/field name, read only" 
+          "id": "int",
+          "type": "user|field|workflow_starter",
+          "source_id": "?str - user or group id or the api_name or null"
+          "label": "str -  user/group/field name, read only"
         },
       ],
       "checklists": [
@@ -345,19 +349,19 @@ template_info = {
         }
       ],
       "fields": [#fields are optional
-    	{ 
+    	{
     	  "api_name": "string optional",
-    	  "order": "int", 
-          "name": "string", 
-          "type": "string, 
+    	  "order": "int",
+          "name": "string",
+          "type": "string,
           "is_required": "bool optional, default - false",
-          "description": "string optiona", 
+          "description": "string optiona",
           "default": "string optional",
           "selections": [     #only passed in for radio buttons, checkboxes and dropdown lists
-            { 
+            {
               "value": "string"
             }
-          ] 
+          ]
     	}
       ],
       "conditions": [#an optional parameter
@@ -387,18 +391,18 @@ template_info = {
 
 json_data = json.dumps(template_info)
 r = requests.post(
-    f'https://api.pneumatic.app/templates', 
+    f'https://api.pneumatic.app/templates',
     headers=headers,
     data=json_data,
 )
 
 ```
+
 The endpoint creates a new template as per the parametrs passed in the json.
 
 ### HTTP Request
 
 `POST https://api.pneumatic.app/templates`
-
 
 ## Upload file for attachment
 
@@ -420,7 +424,7 @@ file_info = json.dumps({
 })
 
 attachment_info = requests.post(
-    'https://api.pneumatic.app/workflows/attachments', 
+    'https://api.pneumatic.app/workflows/attachments',
     headers=headers,
     data=file_info,
 ).json()
@@ -429,18 +433,18 @@ payload = '<file contents here>'
 
 r = requests.put(
     attachment_info['file_upload_url'],
-    data=payload, 
+    data=payload,
     headers={'Content-Type': content_type},
 )
 ```
 
-> The above command returns JSON structured like this:
+> The above request returns JSON structured like this:
 
 ```json
 {
   "id": int,
   "file_upload_url": str, // URL to upload file
-  "thumbnail_upload_url": str?, // URL to upload thumbnail 
+  "thumbnail_upload_url": str?, // URL to upload thumbnail
 }
 ```
 
@@ -450,12 +454,12 @@ r = requests.put(
 
 ### Body Parameters
 
-Parameter | Required | Description
---------- | --------- | -----------
-filename  | Yes |
-content_type  | Yes | Header is used to indicate the media type of the resource (e.g. `image/png`)
-size  | Yes | Size of file (less than 104857600 bytes)
-thumbnail | No  | Boolean. Set `true` if you'd like to upload thumbnail image
+| Parameter    | Required | Description                                                                  |
+| ------------ | -------- | ---------------------------------------------------------------------------- |
+| filename     | Yes      |
+| content_type | Yes      | Header is used to indicate the media type of the resource (e.g. `image/png`) |
+| size         | Yes      | Size of file (less than 104857600 bytes)                                     |
+| thumbnail    | No       | Boolean. Set `true` if you'd like to upload thumbnail image                  |
 
 ## Make a file public
 
@@ -470,17 +474,17 @@ headers = {
 attachment_id = 123
 
 r = requests.post(
-    f'https://api.pneumatic.app/workflows/attachments/{attachment_id}/publish', 
+    f'https://api.pneumatic.app/workflows/attachments/{attachment_id}/publish',
     headers=headers,
 )
 ```
 
-> The above command returns JSON structured like this:
+> The above request returns JSON structured like this:
 
 ```json
 {
   "url": "str",
-  "thumbnail_url": "str",
+  "thumbnail_url": "str"
 }
 ```
 
@@ -492,14 +496,15 @@ You have to make your file public. Otherwise, nobody can watch it.
 
 ### URL Parameters
 
-Parameter | Description
---------- | -----------
-ID | The ID of the attachment
+| Parameter | Description              |
+| --------- | ------------------------ |
+| ID        | The ID of the attachment |
 
 # Workflows
 
 ## Launch a Workflow Based on Specific Template
-<a id="workflow-run"></a> 
+
+<a id="workflow-run"></a>
 
 ```python
 import json
@@ -512,16 +517,18 @@ headers = {
 }
 template_id = 1
 workflow_info = {
-  "id": template_id,
-  "name": "Workflow Name",
+  "name":"workflow_name - optional",
+  "due_date_tsp":"timestamp due date(optional)",
+  "ancestor_task_id":"int|nill - the id of the parent task if launching as an embedded workflow",
+  "is_urgent":"bool - set to true if the new workflow is to be marked as urgent",
   "kickoff": { // nullable
     "string-field-1": "Value 1",
     "text-field-2": "Value 2",
-    "dropdown-field-3": "selection ID",
-    "checkbox-field-4":["selection ID", ...],
-    "radio-field-5": "selection ID",
-    "date-field-6": "date in ISO format",
-    "file-field-7": ["attachment ID", ...], 
+    "dropdown-field-3": "selection api_name",
+    "checkbox-field-4":["selection api_name", ...],
+    "radio-field-5": "selection api_name",
+    "date-field-6": "date in the DD/MM/YYYY format",
+    "file-field-7": ["attachment ID", ...],
     "url-field-8": "https://grave.com/",
     "user-field-9": 1 // user id
   }
@@ -529,21 +536,23 @@ workflow_info = {
 
 json_data = json.dumps(workflow_info)
 r = requests.post(
-    f'https://api.pneumatic.app/templates/{template_id}/run', 
+    f'https://api.pneumatic.app/templates/{template_id}/run',
     headers=headers,
     data=json_data,
 )
 ```
 
-> The above command returns JSON structured like this:
+> The above request returns JSON structured like this:
 
 ```json
 {
-  "workflow_id": 1
+  "workflow_id": 1,
+  "first_task_performers":[int]
 }
 ```
 
 This endpoint launches a new workflow based on specific template.
+The **first_task_performers** response parameter contains the ids of the performers assigned to the first task.
 
 ### HTTP Request
 
@@ -551,21 +560,22 @@ This endpoint launches a new workflow based on specific template.
 
 ### URL Parameters
 
-Parameter | Description
---------- | -----------
-ID | The ID of the template to launch
-
+| Parameter | Description                                        |
+| --------- | -------------------------------------------------- |
+| ID        | The ID of the template to launch the workflow from |
 
 ### Body Parameters
 
-Parameter | Required | Description
---------- | --------- | -----------
-name | Yes | The name of the workflow you'd like to launch
-tasks | No | Used if needed to overwrite some template's tasks properties designed by owner. For now, only `url` supported.
-kickoff | Yes if there are required fields in kickoff | Dictionary where the keys are API names of kickoff fields. Checkbox and radio fields take as values IDs of selections. Retrieve a template to get these IDs.
-
+| Parameter        | Required                                    | Description                                                                                                                                                  |
+| ---------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| name             | No                                          | The name of the workflow you'd like to launch. If no name is supplied the default name 'current date - template name' will be used                           |
+| is_urgent        | No                                          | The default value is false, the parameter determines whether the new workflow will be marked as urgent.                                                      |
+| ancestor_task_id | No                                          | Supply this parameter if you want the new workflow to be embedded in an existing task.                                                                       |
+| due_date_tsp     | No                                          | Supply this parameter if you want to set the due date for the workflow as a timestamp.                                                                       |
+| kickoff          | Yes if there are required fields in kickoff | Dictionary where the keys are API names of kickoff fields. Checkbox and radio fields take as values IDs of selections. Retrieve a template to get these IDs. |
 
 ## Get Workflows fields data
+
 <a id="workflow-fields"></a>
 
 ```python
@@ -577,7 +587,7 @@ headers = {
 }
 
 r = requests.get(
-    f'https://api.pneumatic.app/workflows/fields', 
+    f'https://api.pneumatic.app/workflows/fields',
     headers=headers,
     params={
       'template_id': 1,
@@ -589,27 +599,27 @@ r = requests.get(
 )
 ```
 
-> The above command returns JSON structured like this:
+> The above request returns JSON structured like this:
 
 ```json
 {
   "count": int,
   "next": str?, // link to the next page
   "previous": str?, // link to the previous page
-  "results":[ 
+  "results":[
     {
-      "id": str, 
-      "name": str, 
-      "status": str, 
-      "date_created": str, // format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
-      "date_completed": str, // format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
+      "id": str,
+      "name": str,
+      "status": str,
+      "date_created": str, // format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS]
+      "date_completed": str, // format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS]
       "fields": [
         {
-          "id": int, 
+          "id": int,
           "task_id": int | null,
           "kickoff_id": int | null,
           "type": str, // string|text|radio|checkbox|date|url|dropdown|file|user
-          "api_name": str, 
+          "api_name": str,
           "name": str,
           "value": str,
           "attachments": [
@@ -642,17 +652,18 @@ This endpoint returns workflows fields data based on specific template.
 
 ### URL Parameters
 
-Parameter | Required | Description
---------- | -------- | -----------
-template_id | yes |The ID of the template
-status | no | Workflows status.<br> Possible values: `running`, `delayed`, `done`
-fields | no | List of `api_name` task/kickoff fields separated by `,`.<br> For example: `field-1,field-2`<br> You can take api_names from [Get a Specific Template API](#get-template) 
-limit | no | Size of page. Default value is 15
-offset | no | Number of page. Default value is 0
+| Parameter   | Required | Description                                                                                                                                                              |
+| ----------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| template_id | yes      | The ID of the template                                                                                                                                                   |
+| status      | no       | Workflows status.<br> Possible values: `running`, `delayed`, `done`                                                                                                      |
+| fields      | no       | List of `api_name` task/kickoff fields separated by `,`.<br> For example: `field-1,field-2`<br> You can take api_names from [Get a Specific Template API](#get-template) |
+| limit       | no       | Size of page. Default value is 15                                                                                                                                        |
+| offset      | no       | Number of page. Default value is 0                                                                                                                                       |
 
 # Tasks
 
 ## Get a list of tasks
+
 <a id="get-task-list"></a>
 
 ```python
@@ -664,12 +675,12 @@ headers = {
 }
 
 r = requests.get(
-    f'https://api.pneumatic.app/v3/tasks?assigned_to=<user_id>', 
+    f'https://api.pneumatic.app/v3/tasks?assigned_to=<user_id>',
     headers=headers,
 )
 ```
 
-> The above command returns JSON structured like this:
+> The above request returns JSON structured like this:
 
 ```json
 {
@@ -681,7 +692,7 @@ r = requests.get(
       "id": str,
       "name": str,
       "workflow_name": str,
-      "due_date": null|str?, // null if task doesn't have a due date. Format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
+      "due_date": null|str?, // null if task doesn't have a due date. Format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS]
       "template_id": int,
       "template_task_id": int,
       "is_urgent": bool
@@ -698,13 +709,14 @@ This endpoint returns running tasks assigned to a specified user.
 
 ### URL Parameters
 
-Parameter | Required | Description
---------- | -------- | -----------
-assigned_to | no | User id assigned to tasks 
-limit | no | Size of page
-offset | no | Number of page
+| Parameter   | Required | Description               |
+| ----------- | -------- | ------------------------- |
+| assigned_to | no       | User id assigned to tasks |
+| limit       | no       | Size of page              |
+| offset      | no       | Number of page            |
 
 ## Get a single task
+
 <a id="get-specific-task"></a>
 
 ```python
@@ -716,12 +728,12 @@ headers = {
 }
 
 r = requests.get(
-    f'https://api.pneumatic.app/v2/tasks/<id>', 
+    f'https://api.pneumatic.app/v2/tasks/<id>',
     headers=headers,
 )
 ```
 
-> The above command returns JSON structured like this:
+> The above request returns JSON structured like this:
 
 ```json
 {
@@ -744,11 +756,11 @@ r = requests.get(
    },
    "output": [
      {
-      "id": int, 
+      "id": int,
       "task_id": int | null,
       "kickoff_id": int | null,
       "type": str, // string|text|radio|checkbox|date|url|dropdown|file|user
-      "api_name": str, 
+      "api_name": str,
       "name": str,
       "value": str,
       "attachments": [
@@ -778,6 +790,7 @@ This endpoint returns a specific task.
 `GET https://api.pneumatic.app/v2/tasks/<id>`
 
 ## Complete a task
+
 <a id="complete-task"></a>
 
 ```python
@@ -791,7 +804,7 @@ headers = {
 workflow_id ='the id of the workflow you want to complete the curren task in'
 workflow = requests.get(f"https://api.pneumatic.app/workflows/{workflow_id}", headers=headers).json()
 
-task_id =workflow['current_task']['id'] 
+task_id =workflow['current_task']['id']
 user_id='the id of the user who will be completing the task(optiona)'
 
 headers = {
@@ -815,8 +828,9 @@ r = requests.post(
   data = json_data
 )
 ```
->if successful the above request returns a success code
->otherwise a json describing the nature of the error will be returned
+
+> if successful the above request returns a success code
+> otherwise a json describing the nature of the error will be returned
 
 The endpoint completes the current task in a workflow
 
@@ -831,10 +845,9 @@ These are passed in as a json of the form shown in the code example on the right
 
 Thus, to complete a task, you need to know:
 
-* the id of the workflow the task belongs to – you can look this up in Pneumatic
-* the id of the task to complete – you can query the workflow for the id of the current task
-* the API names of the output fields you want to fill out, along with the selection ids of the checkbox and radio button fields you'll be filling out – you can look these up on the API tab in the integrations section of your template
-
+- the id of the workflow the task belongs to – you can look this up in Pneumatic
+- the id of the task to complete – you can query the workflow for the id of the current task
+- the API names of the output fields you want to fill out, along with the selection ids of the checkbox and radio button fields you'll be filling out – you can look these up on the API tab in the integrations section of your template
 
 # Users
 
@@ -849,12 +862,12 @@ headers = {
 }
 
 r = requests.get(
-  'https://api.pneumatic.app/accounts/users?offset=0&limit=20', 
+  'https://api.pneumatic.app/accounts/users?offset=0&limit=20',
   headers=headers,
 )
 ```
 
-> The above command returns JSON structured as follows:
+> The above request returns JSON structured as follows:
 
 ```json
 {
@@ -891,27 +904,43 @@ r = requests.get(
 
 ### URL Parameters
 
-Parameter | Description
---------- | -----------
-ordering | the field to order by.
-type | filter by user type.
-status | user status.
-groups | filter by group.
-limit | Use for pagination.
-offset | Use for pagination.
+| Parameter | Description            |
+| --------- | ---------------------- |
+| ordering  | the field to order by. |
+| type      | filter by user type.   |
+| status    | user status.           |
+| groups    | filter by group.       |
+| limit     | Use for pagination.    |
+| offset    | Use for pagination.    |
 
-Odering specifies the field the results are ordered by, several values can be passed in separated by a comma. Use a '-' to invert the order.
+**Odering** specifies the field the results are ordered by, several values can be passed in separated by a comma. Use a '-' to invert the order.
 Possible fields users can be ordered by:
 
 - last_name(default),
-- first_name, 
+- first_name,
 - status
 
-InvitedFromEnum:
+The **type** parameter lets you filter users by user type. Several comma separated values can be passed in to get several types of users in the response. The available values are:
 
-- email
-- google
-- slack
+- guest
+- user
+
+The **status** parameter filters users by status. Several comma separated values can be passed in to get users with severeal different statuses. The available values are:
+
+- active(default)
+- inactive (this refers to deleted users)
+- invited (users that have been sent invites but haven't accepted them yet)
+
+The **groups** parameter lets you to only select users that belong to a specific group identified by its **id**. Several group ids can be passed in as a comma separated list.
+
+The **limit** parameter limits the number of user records returned per page.
+The **offset** parameter tells the API which page to start with.
+
+**Response options**
+
+**200** means the reqeuest has been processed successfully return a response in the format show above.
+
+**400** means there was a validation error
 
 # Webhooks
 
@@ -928,7 +957,7 @@ end_point = 'https://api.pneumatic.app/webhooks/events'
 r = requests.get(end_point, headers=headers)
 ```
 
-> The command returns a list of events with the current state of the subscription for each one of them:
+> The request returns a list of events with the current state of the subscription for each one of them:
 
 ```json
 [
@@ -969,7 +998,6 @@ Pneumatic has four basic events you can subscribe to via webhooks:
 - task completed
 - task returned
 
-
 ## Get a Specific Event
 
 ```python
@@ -982,12 +1010,12 @@ headers = {
 end_point = 'https://api.pneumatic.app/webhooks/events/event_name'
 
 r = requests.get(
-  end_point, 
+  end_point,
   headers=headers,
 )
 ```
 
-> If successful the above command returns a jason with the url subscribed to the event or null
+> If successful the above request returns a jason with the url subscribed to the event or null
 
 ```json
 {
@@ -997,25 +1025,25 @@ r = requests.get(
 
 The endpoint returns the url subscribed to a specific event or nill
 
-
 ### HTTP Request
 
 `GET https://api.pneumatic.app/webhooks/events/event_name`
 
 ### Available event names
 
-Event name | Description
---------- | -----------
-workflow_completed | an entire workflow is completed
-workflow_started | a new workflow is started
-task_completed_v2 | a task is completed
-task_returned| a task is returned
+| Event name         | Description                     |
+| ------------------ | ------------------------------- |
+| workflow_completed | an entire workflow is completed |
+| workflow_started   | a new workflow is started       |
+| task_completed_v2  | a task is completed             |
+| task_returned      | a task is returned              |
 
 <aside class="notice">
 The events are template-agnostic, i.e. you will get notified about completed/returned tasks and completed/started workflows regadless of the template 
 </aside>
 
 ## Subscribe to an event
+
 ```python
 import requests
 
@@ -1031,7 +1059,7 @@ payload = {
 r = requests.post(end_point, headers=headers, data = payload)
 ```
 
-> if successful, the commande will subscribe subscription_url to event_name:
+> if successful, the request will subscribe subscription_url to event_name:
 > If executed successfully, the request returns an ampty body
 
 ```json
@@ -1046,19 +1074,19 @@ This endpoint subscribes you to the event_name event.
 
 ### Available event names
 
-Event name | Description
---------- | -----------
-workflow_completed | an entire workflow is completed
-workflow_started | a new workflow is started
-task_completed_v2 | a task is completed
-task_returned| a task is returned
-
+| Event name         | Description                     |
+| ------------------ | ------------------------------- |
+| workflow_completed | an entire workflow is completed |
+| workflow_started   | a new workflow is started       |
+| task_completed_v2  | a task is completed             |
+| task_returned      | a task is returned              |
 
 <aside class="notice">
 Note: any existing subscription will be overwritten
 </aside>
 
-## Unsubscribe from an event 
+## Unsubscribe from an event
+
 ```python
 import requests
 
@@ -1071,12 +1099,11 @@ end_point = 'https://api.pneumatic.app/webhooks/events/event_name/unsubscribe'
 r = requests.post(end_point, headers=headers)
 ```
 
-> if successful, the command will ubsubscibe you from the event_name event:
-> If successfuly command returns 204 and an empty body
+> if successful, the request will ubsubscibe you from the event_name event:
+> If successfuly request returns 204 and an empty body
 
 ```json
 {}
-
 ```
 
 This endpoint unsubscribes you from the event_name event.
@@ -1087,16 +1114,17 @@ This endpoint unsubscribes you from the event_name event.
 
 ### Available event names
 
-Event name | Description
---------- | -----------
-workflow_completed | an entire workflow is completed
-workflow_started | a new workflow is started
-task_completed_v2 | a task is completed
-task_returned| a task is returned
+| Event name         | Description                     |
+| ------------------ | ------------------------------- |
+| workflow_completed | an entire workflow is completed |
+| workflow_started   | a new workflow is started       |
+| task_completed_v2  | a task is completed             |
+| task_returned      | a task is returned              |
 
 There is no need to supply a specific url, the webhook url for the specified event will simply be deleted.
 
 ## Subscribe to all events at once
+
 ```python
 import requests
 
@@ -1109,8 +1137,8 @@ end_point = 'https://api.pneumatic.app/webhooks/subscribe'
 r = requests.post(end_point, headers=headers)
 ```
 
-> if successful, the command will subscribe you to all events at once:
-> The command returns the subscription url that will be set for all events:
+> if successful, the request will subscribe you to all events at once:
+> The request returns the subscription url that will be set for all events:
 
 ```json
 {
@@ -1125,6 +1153,7 @@ This endpoint subscribes you to all events at once.
 `POST https://api.pneumatic.app/webhooks/subscribe`
 
 ## Unsubscribe from all events at once
+
 ```python
 import requests
 
@@ -1137,9 +1166,9 @@ end_point = 'https://api.pneumatic.app/webhooks/unsubscribe'
 r = requests.post(end_point, headers=headers)
 ```
 
-> if successful, the command will cancel all your subscriptions at once.
+> if successful, the request will cancel all your subscriptions at once.
 > All the urls for all the events will have been wiped.
-> The command returns an empty body
+> The request returns an empty body
 
 ```json
 {}
@@ -1151,9 +1180,8 @@ This endpoint cancels all your webhook subscriptions at once.
 
 `POST https://api.pneumatic.app/webhooks/unsubscribe`
 
-
-
 ## Task Completed Webhook Event Schema
+
 <a id="task-completed-webhook"></a>
 
 ```json
@@ -1263,12 +1291,15 @@ This endpoint cancels all your webhook subscriptions at once.
 `event: task_completed_v2`
 
 ## Task Returned Webhook Event Schema
+
 <a id="task-returned-webhook"></a>
 
 `event: task_returned`
 
 See [Task Completed Webhook Event Schema](#task-completed-webhook)
+
 ## Workflow Started Webhook Event Schema
+
 <a id="workflow-started-webhook"></a>
 
 ```json
@@ -1369,6 +1400,7 @@ Available workflow statuses:
 - 3 - Snoozed
 
 ## Workflow Completed Webhook Event Schema
+
 <a id="workflow-completed-webhook"></a>
 `event: workflow_completed`
 
