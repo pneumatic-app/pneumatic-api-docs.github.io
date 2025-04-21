@@ -1,8 +1,8 @@
 # Introduction
 
-Welcome to the Pneumatic API! You can use our API to access Pneumatic public API endpoints, which can get information on templates and run workflows.
+Welcome to the Pneumatic API! You can use it to get data and perform actions in Pneumatic programmatically.
 
-All the examples in the dark area are provided in Python code.
+All the examples in this guide are in python.
 
 # Authentication
 
@@ -488,7 +488,7 @@ r = requests.post(
 }
 ```
 
-You have to make your file public. Otherwise, nobody can watch it.
+You have to make your file public. Otherwise, nobody can see it.
 
 ### HTTP Request
 
@@ -527,7 +527,7 @@ workflow_info = {
     "dropdown-field-3": "selection api_name",
     "checkbox-field-4":["selection api_name", ...],
     "radio-field-5": "selection api_name",
-    "date-field-6": "date in the DD/MM/YYYY format",
+    "date-field-6": "a timestamp as a float",
     "file-field-7": ["attachment ID", ...],
     "url-field-8": "https://grave.com/",
     "user-field-9": 1 // user id
@@ -542,13 +542,99 @@ r = requests.post(
 )
 ```
 
-> The above request returns JSON structured like this:
+> The above request the entire workflow, the same as the GET  /workflows/:id :
 
 ```json
-{
-  "workflow_id": 1,
-  "first_task_performers":[int]
-}
+    {
+      "id": int,
+      "name": str,
+      "owners": [int], // id users
+      "description": str,
+      "date_created": str,
+      "date_created_tsp": float,    // timestamp in seconds
+      "date_completed": str | null, // format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
+      "date_completed_tsp": float,  // timestamp in seconds
+      "due_date": str | null,       // the task expiration date in ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
+      "due_date_tsp": float,        // timestamp in seconds
+      "is_external": bool,
+      "is_urgent": bool,
+      "tasks_count": int,
+      "finalizable": bool,
+      "is_legacy_template": bool,
+      "legacy_template_name": str,
+      "status": int,
+      "workflow_starter": int | null // null if is_external
+      "ancestor_task_id": int | null // for subprocesses
+      "template": {
+        "id": int,
+        "name": str,
+        "is_active": bool,
+        "wf_name_template": str | null,
+      },
+      "current_task": {
+        "id": int,
+        "number": int,
+        "name": str,
+        "date_started": str,
+        "date_started_tsp": str,          // timestamp in seconds
+        "due_date": str | null,           // format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
+        "due_date_tsp": float,            // timestamp in seconds
+        "status": str                     // pending, active, completed, snoozed, skipped
+        "performers": [
+          {
+            "type": "user"|"group", 
+            "source_id": int,   // the ide of the user or the group assigned as performer
+          }
+        ],
+        "checklists_total": int,
+        "checklists_marked": int,
+        "delay": null|{
+          "duration": str,         // format: D hh:mm:ss[.SSS] 
+          "start_date": str,       // format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
+          "start_date_tsp": float, // timestamp in seconds
+          "end_date": null|str,    // format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
+          "end_date_tsp": float,   // timestamp in seconds
+          "estimated_end_date": null|str // format ISO 8601: YYYY-MM-DDThh:mm:ss[.SSS] 
+          "estimated_end_date_tsp": float, // timestamp in seconds
+        }
+      },
+      "started_by": {...}, // deprecated
+      "kickoff": {
+        "output": [
+          {
+            "id": int, 
+            "type": str, // string|text|radio|checkbox|date|url|dropdown|file|user
+            "api_name": str, 
+            "name": str,
+            "value": str,   // a string reprsentation of the value
+            "user_id": int, // for user type fields
+            "attachments": [
+              {
+                "id": int,
+                "name": str,
+                "url": str,
+                "size": int
+              }
+            ],
+            "selections": [
+              {
+                "id": int,
+                "api_name": str,
+                "value": str,
+                "is_selected": bool
+              }
+            ]
+          }
+        ]
+      },
+      "passed_tasks": [
+        {
+          "id": int,
+          "name": str,
+          "number": int
+        }
+      ]
+    }
 ```
 
 This endpoint launches a new workflow based on specific template.
@@ -644,7 +730,7 @@ r = requests.get(
 }
 ```
 
-This endpoint returns workflows fields data based on specific template.
+This endpoint returns workflows fields data based on a specific template.
 
 ### HTTP Request
 
